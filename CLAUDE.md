@@ -24,4 +24,63 @@ teaching scenario.
 
 ## Working context
 
-_You'll fill this in during Module 1._
+I am the new PM for **Rook Dispatch** (started 24 Aug 2026; I replaced Priya Raghunathan). My director is Helen Achebe. Sources: `rook-wiki` (search_wiki searches titles only; read_page shows comments), `rook-database` (not yet read), and `00-rook/company/notes/handoff-from-priya.docx`. Facts below are as of the wiki's last update, not today (13 Oct 2026).
+
+### Company and products
+Rook Industries (founded 2014, HQ Site Aleph, offices in Berlin, Singapore, Cornwall) sells coordination and provisioning software to masked, independent responders and their handlers. Subscription, priced per active responder. Wiki says monthly release train; actual 4.x releases came every 8-10 weeks. Point releases are 4.x.
+- **Rook Dispatch** (mine): who gets pinged about a callout, and whether they take it. Users: handlers (console, desktop) and responders (phone).
+- **Rook Supply**: gear requisitions, maintenance, failure reports. Users: handlers and quartermasters. Not mine, but it reads Dispatch's Responder Availability Record.
+- **Hard rule:** responder cover identities are never stored; no mapping to legal identity exists. Read Security Policy 4.1 before touching responder records. Never try to work out who anyone is.
+
+### People (comments on the wiki use roles, not names)
+| Role in comments | Person | Notes |
+|---|---|---|
+| Engineering manager | Marcus Oyelaran, Site Aleph | Runs Dispatch engineering. Asked the unanswered 4.2 question below. |
+| Staff engineer | Wen Li, Berlin | Built the ping-ranking logic. Away 14-24 Aug. Best source on how ranking works. |
+| Support lead | Nadia Hoffmann, Berlin | Owns the tickets; has the ticket breakdown ready. |
+| Product designer | Sofia Marino, Site Aleph | Owns console and phone app. Ran the September interviews. |
+| Data analyst | Ravi Menon, Singapore | Owns the weekly acceptance reports. Priya's handoff says to ask Marcus for numbers; Ravi is the real source. |
+| Director of Product | Helen Achebe, Site Aleph | Owns roadmap and commitments. |
+Handlers seen in the wiki: Aunt Dot (for Vesper), Mr. Ambrose (Captain Vantage), Halloran (Sgt. Bulwark; also the Supply quartermaster voice), Kip (Meteor Mite, The Gale).
+
+### Vocabulary
+- **Callout**: request for a responder at an incident. **Ping**: one callout offered to one responder's phone.
+- **Taken / turned down / missed**: yes / no / no answer before the ping wait ends. Turned down and missed are recorded separately, but both move the ping on.
+- **Ping wait**: how long a ping stays live. Same for everyone, set per release.
+- **Acceptance rate**: share of pings taken. Dispatch's headline metric. **Time-to-accept**: median seconds from sent to taken.
+- **Coverage gap**: no available responder had the needed capability tags. Counted apart from low acceptance.
+- **Routing priority**: the score that ranks responders. Inputs: proximity (travel-time estimate), availability, capability match, recent acceptance history. Turning down or missing a ping lowers the recent-acceptance part, which lowers later ranking.
+- **Capability tags**: flight, structural-entry, hazmat-tolerant, cold-weather, aquatic, crowd-management, de-escalation.
+- **Mutual aid**: responders covering for each other across the city. Not supported; Q4 exploration.
+- Supply: requisition, field failure report, service interval.
+
+### Where things stand
+**Releases:** 4.0 (7 Apr): new nav, profile redesign, routing override audit log. 4.1 (16 Jun): travel-time proximity, bulk callout, push reliability. 4.2 (12 Aug): proximity weighted up vs. acceptance history, ping wait cut 90s to 60s, persistent console filters, three fixes.
+
+**The 4.2 problem (my first job):**
+- Since 4.2, callout tickets run about 3x normal (Nadia, 18 Aug). Split roughly two thirds "phone never goes off", one third "gone before I could answer" (26 Aug). Still elevated, flat, as of the last comment (28 Aug).
+- The one-third theme is explained by the 60s ping wait. The two-thirds theme has no explanation yet.
+- Priya's read: seasonal August dip, will recover in September; do not revert 4.2. The data does not support it (see Findings below). Two changes shipped together, so cause is not isolated.
+- Open question from Marcus (14 Aug), never answered: does the ranking change apply to responders who have been turning pings down, or only to others? The config does not distinguish. Wen Li said they would look; no answer is recorded.
+- My hypothesis, unverified: a shorter wait turns slow answers into "missed", which lowers recent acceptance, which lowers ranking, so pings stop reaching those responders. Test with Ravi's weekly data, split by before and after 12 Aug and by responder history.
+- Marcus asked to regroup on 4.2 once I had a week to look. Nadia will bring the ticket breakdown.
+
+**Roadmap (Q3, last reviewed 30 Jun, all owned by Priya, now stale):**
+- 4.2 "Change to who gets pinged": shipped. 4.2 "Ping timeout tuning": a 90s to 60s cut shipped; unclear if "tuning" meant more.
+- 4.2 "Availability Confidence": still marked Committed, but not in the 4.2 release notes. Probably squeezed out. Priya said to ask Helen which Q3 items are still commitments. That conversation has not happened.
+- 4.3 "Requisition approval chains": Supply item, Committed. Brief bundles a second approval step over $2,000 with at least four other features; scope is undecided.
+- Q4, Exploring: Handler phone app (brief 8 Sep; Sofia, unstaffed, scope: notifications, status view, one-tap contact) and Shared cover between responders. Mutual aid is also on the Q4 list.
+
+**Stale briefs:** Routing Override Audit Log (5 Mar) and Bulk Callout (12 Jan, "next quarter") both read as unbuilt but shipped in 4.0 and 4.1. Treat brief status as unreliable; check Releases.
+
+**Gaps I own:** no written description of how ping ranking works (Priya asked me to write one; start with Wen Li). Console filter-persistence tickets are noise; do not spend the first month on them. Bulk callout has no time-to-full-coverage baseline.
+
+### How to help me
+Check claims against the wiki and data before repeating them; Priya's handoff is opinion, not fact. Say what is verified and what is a guess. Use role names the way the wiki does, but give me the person's name.
+
+### Findings from the first session (data and code checked)
+- Data (`pings`, 29 Jun to 6 Sep): acceptance sat at 75-78% for six weeks, fell to 54% the week 4.2 shipped, and was 72.7% by 31 Aug. Almost all of the drop is missed pings (2-6 a week before, 38 that week). The abrupt start contradicts Priya's "seasonal" view; there is no prior-year data to test "every year".
+- Vesper, The Undertow, Meteor Mite and Farlight now get about a third or less of their old ping volume and miss about 59% of what they get (2.9% before). The other 12 responders went from 2% to 14% missed, which fits the 60s wait. Ping position within a callout does not show a ranking slide, because a low rank means rarely pinged, not pinged later.
+- Code (`00-rook/code/dispatch-routing`): 4.2 also cut recent-acceptance weight from 0.40 to 0.25 (release notes only mention proximity). A missed ping is scored as a decline (-0.12 vs +0.08 credit), with no decay (2019 TODO). This supports the feedback-loop hypothesis but nobody has tested it.
+- Still open: Marcus's 14 Aug question for Wen Li; `support_tickets` not queried (the 3x claim is unverified); Availability Confidence is undefined anywhere; possible Supply knock-on through the availability record; Halloran's interview (approvals too slow) contradicts the requisition brief (add approvals). Releases came Apr, Jun, Aug, not monthly.
+- Opinion, not fact: Priya's handoff, Marcus's 26 Aug "August dip", the interview anecdotes (four handlers, one leading question), and Helen's `05-super-speed/director-request.txt`, which assumes the cause is found and the fix is small.

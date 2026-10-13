@@ -24,6 +24,16 @@ prompt library built from your own questions.
 
 ### 1.
 
+Pull weekly acceptance rate from rook-database
+
 ### 2.
 
+Yes, break down missed pings by responder, before vs after 12 Aug.
+
 ### 3.
+
+Yes, check ping position for those four.
+
+### 4.
+
+What's contradictory or missing across the wiki pages, the handover note, and the rest of this folder? Specifically focus on information that may be opinion not fact.
