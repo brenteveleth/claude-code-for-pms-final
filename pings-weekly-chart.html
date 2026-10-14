@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rook Dispatch: weekly ping outcomes before and after 4.2</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;color:#0b0b0b;background:#fff}
+h1{font-size:20px;font-weight:500;margin:0 0 4px}
+p{font-size:13px;color:#52514e;margin:0 0 12px}
+.lg{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:#52514e}
+.lg span{display:flex;align-items:center;gap:4px}
+.lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.box{position:relative;width:100%;height:360px}
+@media (prefers-color-scheme:dark){body{background:#1a1a19;color:#f0efec}p,.lg{color:#c3c2b7}}
+</style>
+</head>
+<body>
+<h1>Share of pings taken, turned down and missed, by week</h1>
+<p>Source: rook-database, table pings, 29 Jun to 6 Sep 2026. Release 4.2 shipped 12 Aug. The 10 Aug week is split at the release.</p>
+<div class="lg">
+<span><i style="background:#2a78d6"></i>Taken %</span>
+<span><i style="background:#1baf7a"></i>Turned down %</span>
+<span><i style="background:#eb6834"></i>Missed %</span>
+</div>
+<div class="box"><canvas id="pc" role="img" aria-label="Weekly percent of pings taken, turned down and missed. Taken is about 77% before 12 August, drops to 47% in 12-16 August and recovers to 73% by 31 August. Missed rises from about 2% to 29% then eases to 13%."></canvas></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const x=[3.5,10.5,17.5,24.5,31.5,38.5,43,46.5,52.5,59.5,66.5];
+const mk=a=>a.map((v,i)=>({x:x[i],y:v}));
+const taken=[76.7,77.1,76.4,75.0,77.6,77.9,72.5,46.8,65.8,66.7,72.7];
+const down=[21.5,20.6,20.1,22.2,20.0,20.9,25.5,23.8,16.5,18.5,14.5];
+const miss=[1.7,2.4,3.4,2.8,2.4,1.2,2.0,29.4,17.7,14.8,12.7];
+const ticks={0:'29 Jun',7:'6 Jul',14:'13 Jul',21:'20 Jul',28:'27 Jul',35:'3 Aug',42:'10 Aug',49:'17 Aug',56:'24 Aug',63:'31 Aug'};
+const dark=matchMedia('(prefers-color-scheme: dark)').matches;
+const ink=dark?'#c3c2b7':'#52514e',grid=dark?'#2c2c2a':'#e1e0d9',red=dark?'#e66767':'#d03b3b';
+const marker={id:'marker',
+beforeDatasetsDraw(c){const{ctx,chartArea:a,scales:{x:sx}}=c;const px=sx.getPixelForValue(44);ctx.save();ctx.fillStyle=dark?'rgba(255,255,255,0.05)':'rgba(11,11,11,0.05)';ctx.fillRect(px,a.top,a.right-px,a.bottom-a.top);ctx.restore();},
+afterDatasetsDraw(c){const{ctx,chartArea:a,scales:{x:sx}}=c;const px=sx.getPixelForValue(44);ctx.save();ctx.strokeStyle=red;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke();ctx.fillStyle=red;ctx.font='500 12px sans-serif';ctx.textAlign='right';ctx.fillText('Before',px-8,a.top+12);ctx.textAlign='left';ctx.fillText('12 Aug: 4.2 ships',px+8,a.top+12);ctx.fillText('After',px+8,a.top+28);ctx.restore();}};
+const ds=(label,d,col,dash)=>({label,data:mk(d),borderColor:col,backgroundColor:col,borderWidth:2,borderDash:dash,pointRadius:4,pointHoverRadius:6,tension:0});
+new Chart(document.getElementById('pc'),{type:'line',
+data:{datasets:[ds('Taken %',taken,'#2a78d6',[]),ds('Turned down %',down,'#1baf7a',[6,4]),ds('Missed %',miss,'#eb6834',[2,3])]},
+options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},
+plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>{const v=i[0].parsed.x;return v===43?'10-11 Aug (before)':v===46.5?'12-16 Aug (after)':'Week of '+ticks[Math.round(v-3.5)];},label:i=>i.dataset.label+': '+i.parsed.y.toFixed(1)+'%'}}},
+scales:{x:{type:'linear',min:0,max:70,afterBuildTicks:s=>{s.ticks=Object.keys(ticks).map(v=>({value:+v}));},ticks:{color:ink,font:{size:11},callback:v=>ticks[v]},grid:{display:false},title:{display:true,text:'Week starting (Monday)',color:ink,font:{size:11}}},
+y:{min:0,max:90,ticks:{color:ink,font:{size:11},stepSize:15,callback:v=>v+'%'},grid:{color:grid},title:{display:true,text:'Share of pings',color:ink,font:{size:11}}}}},
+plugins:[marker]});
+</script>
+</body>
+</html>
