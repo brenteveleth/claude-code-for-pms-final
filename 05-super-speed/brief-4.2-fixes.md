@@ -1,7 +1,7 @@
 # Brief: fix the 4.2 quiet-responder problem
 
 For: Helen Achebe · From: Dispatch PM · Draft, 16 Oct 2026
-Status: proposal. Nothing is built. Engineering has not reviewed it.
+Status: proposal. Nothing is built. Engineering has not reviewed it. Helen to confirm: the repeat-miss rule in step 1 and the return to 90s in step 4.
 
 ## The problem in one paragraph
 
@@ -39,8 +39,8 @@ For everyone:
 ## The fix, in order
 
 1. Stop scoring a miss as a decline, and charge only repeat misses. In `offer.py:30` every answer that is not TAKEN calls `record_declined`, and `offer_to` returns TURNED_DOWN or MISSED. The change is to treat MISSED differently there: the first 2 misses in a row cost 0, the 3rd and later cost 0.06, and any answer resets the count. This needs a miss counter per responder, which does not exist today. Replayed 16 Oct on real outcomes from 12 Aug, scores starting at 0.5: the four stay at 0.32 to 0.54 and never reach 0, the other 12 end at 0.84 or higher, and a responder who answers nothing falls from 0.8 to 0.1 in about 14 pings. A flat 0.06 miss penalty fails (all four reach 0). A flat 0.02 is the option with no new state: the four stay at 0.22 or higher, and an absent responder takes about 35 pings to go dormant.
-2. Optional, later: a fade on old low scores (the 2019 TODO, `history.py:30`). It is not needed to stop the loop. It would let a bad month wear off. A floor of 0.0 already exists (`SCORE_FLOOR`, `config.py:22`). A fade needs a time stamp on each score. Design open (see below).
-3. Reset the four once, only after step 1. A reset alone fails: all four were back at 0 within 6 to 13 pings in the replay.
+2. Optional, later: a fade on old low scores (the 2019 TODO, `history.py:30`). It is not needed to stop the loop. It would let a bad month wear off. A floor of 0.0 already exists (`SCORE_FLOOR`, `config.py:22`). A fade needs a time stamp on each score. An even fade toward 0.5 pulled the other 12's lowest final score from 0.84 to about 0.5, so it should act only on low scores. The rate (I tried 0.03 a day) is a guess, so the brief does not specify one.
+3. Reset the four once, only after step 1. A reset alone fails: all four were back at 0 within 6 to 13 pings in the replay. The reset is a real, separate step. Scores probably survived the 4.2 release: if it had wiped them to 0.5, the four would have dropped below 0.3 within 1 to 4 days of 12 Aug, but their volume held at 5 to 9 pings a day until 16 Aug and fell from 17 Aug, which fits scores of 0.84 to 1.00 carrying over. The code holds scores in memory (`history.py:17`), so storage must sit outside this folder. Not proven, because a low score does not drop a responder at once.
 4. Restore the 90s ping wait. With the repeat-miss rule, 60s would no longer sink slow responders (the replay used real 60s outcomes), so 90s is not needed to stop the loop. It is still the better default for now: the 60s wait cut no time from callouts in the data. Misses cost about 2.6 seconds of waiting per callout at 90s (25 misses, 879 callouts) and about 15 seconds at 60s (110 misses, 440 callouts). Pings per callout rose from 1.23 to 1.39. The 4.2 weight change also contributes, so the split is not clean. Later: log how long each answer takes, then re-test a shorter wait (60s or 75s) with that data. 75s cannot be predicted from what we have.
 
 Fast stopgap: step 4 plus the reset. It stops new misses but leaves the loop for the next slow responder.
@@ -65,16 +65,10 @@ Fast stopgap: step 4 plus the reset. It stops new misses but leaves the loop for
 - **It does not touch:** console filters, Availability Confidence, mutual aid, or the Supply link through the availability record (a possible knock-on, untested).
 - **It does not give a new screen.** This is a behavior fix. Handlers see it as pings returning, not as a new feature.
 
-## Open before we build
-
-- Are scores saved, or wiped on restart? In this code they sit in an in-memory dict (`history.py:17`), so a restart sends everyone back to 0.5. If that is how production works, shipping any release would reset everyone and look like a fix for a while, then the loop would start again. The reset step would also happen on its own. The folder has no code that saves scores, but it only shows stubs for the rest of the service. Data check, 16 Oct: if the 4.2 release had wiped scores to 0.5, the four would have dropped below 0.3 within 1 to 4 days of 12 Aug. Their volume held at 5 to 9 pings a day until 16 Aug, then fell from 17 Aug. If scores carried over (0.84 to 1.00 on 12 Aug), they cross 0.3 between day 5 and day 11, which fits better. So scores probably survived the release. That points to storage outside this folder, and it means the one-time reset is a real, separate step. Not proven: a low score does not drop a responder at once, because the rank depends on neighbors.
-- Did 4.2 change any logic beyond the three marked values (wait, proximity weight, acceptance weight)? Checked 16 Oct: the folder has one commit, so no history. The wiki roadmap rows for 4.2 only say "weight proximity more heavily" and "tune the ping wait". The changelog lists the same two changes. The data needs nothing more: in Uptown, neighbors took none of Farlight's callouts before 4.2 only because Farlight took 55 of 59. After 4.2 Farlight is rarely asked, so neighbors take them. Not provable: code outside this folder could still differ.
-- Decided 16 Oct (my recommendation, for Helen to confirm): the first 2 misses in a row cost 0, the 3rd and later cost 0.06, any answer resets the count. Fallback if engineering wants no new state: a flat 0.02 per miss. A flat 0.06 fails in the replay, and a fixed floor is too blunt.
-- Not decided: whether to add a fade at all. It is optional, and a second step. An even fade toward 0.5 pulled the other 12's lowest final score from 0.84 to about 0.5, so it should act only on low scores. The rate (I tried 0.03 a day) is a guess.
-
 ## Source notes
 
 Verified in code (rechecked 16 Oct against `config.py`, `offer.py`, `history.py`, `routing.py`): wait 60s (was 90), weights 0.60 / 0.25 / 0.15, credit +0.08, penalty -0.12, a miss scored as a decline, no fade, and scores held in memory. The 60% break-even and the 8-minute gap follow from those numbers.
 Verified in data: miss rates, volume drop, and the replays (all use real outcomes, so they are a lower bound: with the fix the four get more pings, and how they answer is unknown).
+Checked for other 4.2 logic changes: the folder has one commit, so no history. The wiki roadmap rows and the changelog name only the weight change and the wait cut, and the data needs nothing more (neighbors took none of Farlight's callouts before 4.2 only because Farlight took 55 of 59). Code outside this folder could still differ.
 Inferred: the four answer slowly.
 Opinion, not fact: the handoff doc, "August dip", interview anecdotes.
