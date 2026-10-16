@@ -57,6 +57,8 @@
   .bts .row { display: flex; justify-content: space-between; font-size: 15px; padding: 3px 0; }
   .bts .row b { font-family: var(--display); font-weight: 400; }
   .bts p { margin: 6px 0 0; color: var(--steel); font-size: 13px; }
+  .bts .opt { display: flex; gap: 10px; align-items: center; min-height: 44px; margin-top: 8px; font-size: 14px; color: var(--white); cursor: pointer; }
+  .bts .opt input { width: 22px; height: 22px; }
   .sim { margin-top: 14px; max-width: 372px; margin-inline: auto; display: grid; gap: 6px; }
   .sim button { min-height: 52px; border-radius: 12px; border: 3px solid var(--gold); background: transparent; color: var(--gold); font-weight: 700; font-size: 17px; }
   .sim button:disabled { opacity: .4; cursor: not-allowed; }
@@ -293,7 +295,8 @@
     </div>
     <div class="bts" id="bts" hidden>
       <h3>Behind the scenes · not shown in the product</h3>
-      <p>Taken +0.08. Turned down −0.12. Missed: the first 2 in a row cost 0, the 3rd and later cost 0.06. Any answer resets the count.</p>
+      <p id="rules">Taken +0.08. Turned down −0.12. Missed −0.12. The score never falls below 0.30.</p>
+      <label class="opt"><input type="checkbox" id="p2"> Preview phase 2: the first 2 misses in a row are free</label>
     </div>
   </section>
 </main>
@@ -357,13 +360,13 @@
 
   var NOTE = {
     1: "<b>Page 1 · 4.2 today.</b> One working day for Farlight and Linda, fast-forwarded to about 20 seconds. Built from Farlight's real pattern since 12 Aug (asked on about 1 in 5 Uptown callouts). Answer times are assumed: we have no response-time data.",
-    2: "<b>Page 2 · After the fix.</b> The same three callouts, with the fix in place: Farlight is asked first again, the wait is 90 seconds, and early misses are free. Projected from replays, not live data.",
-    3: "<b>Page 3 · Try it.</b> The product after the fix. Simulate a callout, then take it, pass, or let it run out. Click the ticket button or Farlight's status on the phone."
+    2: "<b>Page 2 · After the fix (phase 1, ships now).</b> The same three callouts: the wait is back to 90 seconds, Farlight's score is reset to 0.50 and cannot fall below 0.30, so Farlight is asked first again. Projected from replays, not live data.",
+    3: "<b>Page 3 · Try it.</b> The product after phase 1. Simulate a callout, then take it, pass, or let it run out. Tick the box under the phone to preview phase 2, where the first 2 misses in a row are free. Click the ticket button or Farlight's status on the phone."
   };
 
   /* ---------- Day scripts ---------- */
   var DAYS = {
-    1: { wait: 60, start: 0, rule: { take: 0.08, turned: -0.12, miss: function () { return -0.12; } }, events: [
+    1: { wait: 60, start: 0, floor: 0, rule: { take: 0.08, turned: -0.12, miss: function () { return -0.12; } }, events: [
       { type: "callout", min: 72, dwell: 1.8, text: T.A, pings: [{ who: "Cindermark", out: "taken" }], f: null,
         say: "09:12 Cindermark is asked first. Farlight is not asked." },
       { type: "callout", min: 185, dwell: 4.2, text: T.B, pings: [{ who: "Farlight", out: "missed" }, { who: "Sgt. Bulwark", out: "taken" }], f: { answerSec: null, out: "missed" },
@@ -372,7 +375,7 @@
         say: "13:30 Sgt. Bulwark is asked first. Farlight is not asked." },
       { type: "ticket", min: 380, dwell: 2.2, say: "14:20 Linda files a ticket: Farlight's phone has gone quiet." }
     ], end: "End of day: Farlight was asked once and took nothing." },
-    2: { wait: 90, start: 0.5, rule: { take: 0.08, turned: -0.12, miss: function (n) { return n >= 3 ? -0.06 : 0; } }, events: [
+    2: { wait: 90, start: 0.5, floor: 0.3, rule: { take: 0.08, turned: -0.12, miss: function () { return -0.12; } }, events: [
       { type: "callout", min: 72, dwell: 3.8, text: T.A, pings: [{ who: "Farlight", out: "taken" }], f: { answerSec: 40, out: "taken" }, busy: 75,
         say: "09:12 Farlight is asked first and takes it in 40 seconds." },
       { type: "callout", min: 185, dwell: 4.2, text: T.B, pings: [{ who: "Farlight", out: "taken" }], f: { answerSec: 70, out: "taken" }, busy: 60,
@@ -483,7 +486,7 @@
             if (pg.out === "taken") { w.stats.t++; w.streak = 0; d = rule.take; }
             else if (pg.out === "turned") { w.stats.d++; w.streak = 0; d = rule.turned; }
             else { w.stats.m++; w.streak++; d = rule.miss(w.streak); }
-            var ns = Math.max(0, Math.min(1, Math.round((w.score + d) * 100) / 100));
+            var ns = Math.max(day.floor, Math.min(1, Math.round((w.score + d) * 100) / 100));
             entry.delta = Math.round((ns - w.score) * 100) / 100; w.score = ns;
           }
         }
@@ -549,10 +552,13 @@
   });
 
   /* ---------- Page 3: the interactive product ---------- */
-  var live = null, simTimer = null, simIdx = 0, SPEED = 6;
+  var live = null, simTimer = null, simIdx = 0, SPEED = 6, FLOOR = 0.3;
+  function rulesText() { return $("p2").checked ? "Taken +0.08. Turned down −0.12. Missed: the first 2 in a row cost 0, the 3rd and later cost 0.06, and any answer resets the count. The score never falls below 0.30." : "Taken +0.08. Turned down −0.12. Missed −0.12. The score never falls below 0.30."; }
+  $("p2").addEventListener("change", function () { $("rules").textContent = rulesText(); });
   var ORDER = [T.E, T.D, T.F, T.B, T.A, T.C];
   function liveReset() {
     clearInterval(simTimer); simIdx = 0;
+    $("p2").checked = false; $("rules").textContent = rulesText();
     live = blank(); live.score = 0.5; live.start = 0.5; live.streak = 0; live.clock = 9 * 60; live.active = false;
     live.total = 90; liveBts(); render(live); $("send").disabled = false;
   }
@@ -586,10 +592,11 @@
     var before = live.score;
     if (kind === "take") { live.score = Math.min(1, live.score + 0.08); live.streak = 0; live.stats.t++; live.status = "On callout"; live.screen = "on"; }
     else if (kind === "pass") {
-      live.score = Math.max(0, live.score - 0.12); live.streak = 0; live.stats.d++; live.status = "Available";
+      live.score = Math.max(FLOOR, live.score - 0.12); live.streak = 0; live.stats.d++; live.status = "Available";
       live.screen = "res"; live.res = { big: "Passed.", p: "The callout moved on.", cls: "" };
     } else {
-      live.streak++; live.stats.m++; live.status = "Available"; if (live.streak >= 3) live.score = Math.max(0, live.score - 0.06);
+      live.streak++; live.stats.m++; live.status = "Available";
+      live.score = Math.max(FLOOR, live.score - ($("p2").checked ? (live.streak >= 3 ? 0.06 : 0) : 0.12));
       live.screen = "res"; live.res = { big: "Time's up.", p: "The callout moved on.", cls: "m" };
     }
     live.score = Math.round(live.score * 100) / 100;
