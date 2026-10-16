@@ -8,254 +8,253 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Black&display=swap">
 <style>
   :root {
-    --night: #0c1030;
-    --ink: #151a45;
-    --cobalt: #3b5bff;
-    --gold: #ffc400;
-    --alarm: #ff3b4f;
-    --ok: #29d391;
-    --mist: #e8ecfa;
-    --steel: #8c95c8;
-    --white: #ffffff;
+    --night: #0c1030; --ink: #151a45; --cobalt: #3b5bff; --gold: #ffc400; --alarm: #ff3b4f;
+    --ok: #29d391; --okdeep: #0c9e6a; --mist: #e8ecfa; --steel: #8c95c8; --white: #fff; --sub: #4a5282;
     --display: "Archivo Black", Impact, "Arial Black", sans-serif;
     --body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--night); color: var(--white);
-    font-family: var(--body); font-size: 16px; line-height: 1.45;
-  }
+  body { margin: 0; background: #070a22; color: var(--white); font-family: var(--body); font-size: 16px; line-height: 1.45; }
   button { font: inherit; color: inherit; cursor: pointer; }
   :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  [hidden] { display: none !important; }
 
-  /* ---------- Prototype bar ---------- */
-  .bar {
-    position: sticky; top: 0; z-index: 10;
-    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
-    padding: 12px 24px; background: var(--night); border-bottom: 3px solid var(--gold);
-  }
-  .bar h1 { margin: 0; font-family: var(--display); font-size: 20px; letter-spacing: .01em; }
-  .bar p { margin: 0; color: var(--steel); font-size: 14px; }
-  .switch { display: inline-flex; background: var(--ink); border: 2px solid var(--steel); border-radius: 14px; padding: 4px; gap: 4px; }
-  .switch button {
-    border: 0; background: transparent; padding: 12px 20px; border-radius: 10px;
-    font-weight: 700; font-size: 16px; min-height: 48px; color: var(--steel);
-  }
-  .switch button[aria-pressed="true"] { background: var(--gold); color: var(--night); }
+  /* ===== Prototype chrome (not part of the product) ===== */
+  .nav { position: sticky; top: 0; z-index: 20; background: #070a22; border-bottom: 1px solid #262c66; padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+  .nav h1 { margin: 0; font-family: var(--display); font-size: 17px; font-weight: 400; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tabs button { min-height: 44px; padding: 8px 18px; border-radius: 10px; border: 2px solid #262c66; background: transparent; color: var(--steel); font-weight: 700; }
+  .tabs button[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: var(--night); }
+  .note { max-width: 1320px; margin: 0 auto; padding: 14px 20px 0; color: var(--steel); font-size: 15px; }
+  .note b { color: var(--white); }
 
-  /* ---------- Layout ---------- */
-  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 32px; padding: 32px 24px 56px; max-width: 1320px; margin: 0 auto; align-items: start; }
-  @media (max-width: 960px) {
-    .stage { grid-template-columns: 1fr; padding: 20px 16px 48px; }
-    .phone-col { order: -1; }
-  }
-  .caption { margin: 0 0 10px; color: var(--steel); font-size: 14px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 32px; padding: 18px 20px 24px; max-width: 1320px; margin: 0 auto; align-items: start; }
+  @media (max-width: 960px) { .stage { grid-template-columns: 1fr; } .phone-col { order: -1; } }
+  .cap { margin: 0 0 8px; color: var(--steel); font-size: 13px; }
 
-  /* ---------- Handler console ---------- */
-  .console {
-    background: var(--mist); color: var(--night); border-radius: 18px; overflow: hidden;
-    box-shadow: 8px 8px 0 var(--cobalt);
-  }
-  .console header {
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    padding: 14px 22px; background: var(--night); color: var(--white); border-bottom: 4px solid var(--gold);
-  }
-  .console header strong { font-family: var(--display); font-size: 18px; }
-  .console header span { color: var(--steel); font-size: 14px; }
-  .console .body { padding: 22px; display: grid; gap: 18px; }
+  .tl { max-width: 1320px; margin: 0 auto 40px; padding: 0 20px; }
+  .tlbox { background: #10154a; border: 1px solid #262c66; border-radius: 16px; padding: 14px 18px 16px; }
+  .tlrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .clock { font-family: var(--display); font-size: 34px; min-width: 96px; }
+  .ctl { min-height: 44px; padding: 8px 18px; border-radius: 10px; border: 2px solid var(--gold); background: var(--gold); color: var(--night); font-weight: 700; }
+  .ctl.alt { background: transparent; color: var(--gold); }
+  .narr { flex: 1; min-width: 220px; margin: 0; font-size: 16px; }
+  .track { position: relative; height: 64px; margin-top: 12px; cursor: pointer; }
+  .rail { position: absolute; left: 0; right: 0; top: 22px; height: 8px; background: #262c66; border-radius: 4px; }
+  .busy { position: absolute; top: 22px; height: 8px; background: var(--ok); border-radius: 4px; opacity: .85; }
+  .tick { position: absolute; top: 38px; transform: translateX(-50%); font-size: 12px; color: var(--steel); }
+  .tick::before { content: ""; position: absolute; left: 50%; top: -12px; height: 8px; border-left: 1px solid var(--steel); }
+  .mk { position: absolute; top: 14px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%; border: 3px solid #070a22; background: var(--steel); padding: 0; z-index: 2; }
+  .mk.taken { background: var(--ok); } .mk.turned { background: var(--gold); } .mk.missed { background: var(--alarm); }
+  .mk.skipped { background: var(--steel); } .mk.ticket { background: var(--cobalt); border-radius: 6px; }
+  .mk .lb { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--white); white-space: nowrap; pointer-events: none; }
+  .head { position: absolute; top: 4px; bottom: 6px; width: 3px; margin-left: -1px; background: var(--white); z-index: 3; pointer-events: none; border-radius: 2px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px; font-size: 13px; color: var(--steel); }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 
-  .banner { border-radius: 14px; padding: 18px 20px; border: 3px solid var(--night); background: var(--white); }
-  .banner h2 { margin: 0 0 4px; font-family: var(--display); font-size: clamp(24px, 3.2vw, 34px); line-height: 1.1; }
-  .banner p { margin: 0; color: #38406f; }
-  .banner.bad { background: #ffe3e6; border-color: var(--alarm); }
-  .banner.good { background: #dcfbef; border-color: #0c9e6a; }
+  .bts { margin-top: 18px; max-width: 372px; margin-inline: auto; background: #10154a; border: 1px dashed var(--steel); border-radius: 14px; padding: 12px 14px; }
+  .bts h3 { margin: 0 0 6px; font-size: 14px; color: var(--steel); font-weight: 600; }
+  .bts .row { display: flex; justify-content: space-between; font-size: 15px; padding: 3px 0; }
+  .bts .row b { font-family: var(--display); font-weight: 400; }
+  .bts p { margin: 6px 0 0; color: var(--steel); font-size: 13px; }
+  .sim { margin-top: 14px; max-width: 372px; margin-inline: auto; display: grid; gap: 6px; }
+  .sim button { min-height: 52px; border-radius: 12px; border: 3px solid var(--gold); background: transparent; color: var(--gold); font-weight: 700; font-size: 17px; }
+  .sim button:disabled { opacity: .4; cursor: not-allowed; }
+  .sim p { margin: 0; color: var(--steel); font-size: 13px; text-align: center; }
 
+  /* ===== Handler console (the product) ===== */
+  .console { background: var(--mist); color: var(--night); border-radius: 18px; overflow: hidden; box-shadow: 8px 8px 0 var(--cobalt); height: 700px; display: flex; flex-direction: column; }
+  .console header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; background: var(--night); color: var(--white); border-bottom: 4px solid var(--gold); }
+  .console header strong { font-family: var(--display); font-weight: 400; font-size: 19px; }
+  .console header .who { color: var(--steel); font-size: 14px; }
+  .hr { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .tkt { min-height: 44px; padding: 8px 16px; border-radius: 10px; border: 0; background: var(--gold); color: var(--night); font-weight: 700; box-shadow: 0 3px 0 #a67f00; }
+  .tkt.pressed { transform: translateY(3px); box-shadow: none; }
+  .tnote { font-size: 13px; color: var(--ok); }
+  .cbody { flex: 1; min-height: 0; padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .cbody > * { flex: none; }
+  .cbody > .panel.fill { flex: 1 1 auto; min-height: 190px; display: flex; flex-direction: column; }
+  .resp { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--white); border: 2px solid var(--night); border-radius: 14px; padding: 14px 18px; }
+  .resp h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1.1; }
+  .resp p { margin: 0; color: var(--sub); font-size: 15px; }
+  .chip { font-weight: 700; font-size: 15px; padding: 8px 16px; border-radius: 999px; background: var(--ok); color: #04281c; }
+  .chip.pinged { background: var(--gold); color: var(--night); }
+  .chip.oncall { background: var(--cobalt); color: var(--white); }
+  .chip.off { background: var(--steel); color: var(--night); }
   .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-  .stat { background: var(--white); border: 2px solid var(--night); border-radius: 12px; padding: 12px 14px; }
-  .stat .k { font-size: 13px; color: #4a5282; font-weight: 600; }
-  .stat .v { font-family: var(--display); font-size: 34px; line-height: 1.1; margin-top: 2px; }
-  .stat .n { font-size: 13px; color: #4a5282; min-height: 2.6em; }
-  .stat.flash { animation: flash .7s ease-out; }
-  @keyframes flash { 0% { background: var(--gold); } 100% { background: var(--white); } }
-
-  .panel { background: var(--white); border: 2px solid var(--night); border-radius: 14px; padding: 16px 18px; }
-  .panel h3 { margin: 0 0 10px; font-size: 17px; font-weight: 700; }
-  .two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
-  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } }
-
-  /* weekly chart */
-  .chart { position: relative; display: flex; align-items: flex-end; gap: 8px; height: 150px; padding-top: 8px; border-bottom: 2px solid var(--night); }
-  .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; position: relative; }
-  .col .bar-v { width: 100%; background: var(--cobalt); border-radius: 4px 4px 0 0; position: relative; }
-  .col.after .bar-v { background: var(--alarm); }
-  .col .num { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
-  .labels { display: flex; gap: 8px; margin-top: 4px; }
-  .labels span { flex: 1; text-align: center; font-size: 11px; color: #4a5282; }
-  .target { position: absolute; left: 0; right: 0; border-top: 3px dashed #0c9e6a; pointer-events: none; display: none; }
-  .target b { position: absolute; right: 0; top: -22px; background: #dcfbef; color: #06603f; font-size: 12px; padding: 1px 6px; border-radius: 6px; }
-  .on-fixed .target { display: block; }
-  .legend { margin: 10px 0 0; font-size: 13px; color: #4a5282; }
-
-  /* rule card */
-  .rule { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-  .rule li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 8px; background: var(--mist); font-size: 15px; }
-  .rule li b { font-family: var(--display); font-weight: 400; white-space: nowrap; }
-  .rule .neg b { color: #c4162b; }
-  .rule .pos b { color: #06603f; }
-  .rule .zero b { color: #4a5282; }
-
-  /* feed */
-  .feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 280px; overflow: auto; }
-  .feed li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--mist); border-left: 6px solid var(--steel); }
-  .feed li.taken { border-left-color: #0c9e6a; }
-  .feed li.turned { border-left-color: var(--gold); }
-  .feed li.missed { border-left-color: var(--alarm); }
-  .feed .what { font-weight: 700; }
-  .feed .sub { font-size: 13px; color: #4a5282; }
-  .feed .d { font-family: var(--display); }
+  .stat { background: var(--white); border: 2px solid var(--night); border-radius: 12px; padding: 10px 14px; }
+  .stat .k { font-size: 13px; color: var(--sub); font-weight: 600; }
+  .stat .v { font-family: var(--display); font-size: 34px; line-height: 1.1; }
+  .perf { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }
+  @media (max-width: 560px) { .perf { grid-template-columns: 1fr; } }
+  .gauge { height: 14px; margin: 6px 0 4px; border: 2px solid var(--night); border-radius: 8px; background: var(--mist); overflow: hidden; }
+  .gauge i { display: block; height: 100%; width: 0; background: var(--cobalt); transition: width .35s ease; }
+  .sc { font-size: 13px; color: var(--sub); }
+  .dl { font-size: 13px; font-weight: 700; color: var(--sub); margin-left: 6px; }
+  .dl.up { color: var(--okdeep); } .dl.down { color: #c4162b; }
+  .panel { background: var(--white); border: 2px solid var(--night); border-radius: 14px; padding: 14px 16px; }
+  .panel h3 { margin: 0 0 10px; font-size: 17px; }
+  .feed { list-style: none; margin: 0; padding: 0 4px 0 0; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .feed li { flex: none; }
+  .feed li { padding: 10px 12px; border-radius: 10px; background: var(--mist); border-left: 6px solid var(--steel); }
+  .feed .t { font-size: 13px; color: var(--sub); }
+  .feed .x { font-weight: 700; margin: 1px 0 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .pc { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #fff; border: 2px solid var(--night); }
+  .pc.taken { background: #bff3de; border-color: var(--okdeep); }
+  .pc.turned { background: #ffeeb3; border-color: #b58900; }
+  .pc.missed { background: #ffd5da; border-color: var(--alarm); }
+  .pc.wait { border-style: dashed; }
+  .arrow { color: var(--sub); }
   .empty { margin: 0; padding: 14px; border: 2px dashed var(--steel); border-radius: 10px; color: #38406f; }
+  .toast { position: absolute; right: 16px; bottom: 16px; background: var(--night); color: var(--white); border: 3px solid var(--ok); padding: 10px 16px; border-radius: 12px; font-weight: 700; }
+  .console { position: relative; }
 
-  /* ---------- Phone ---------- */
-  .phone-col { position: sticky; top: 92px; justify-self: center; width: 100%; max-width: 400px; }
-  @media (max-width: 960px) { .phone-col { position: static; } }
-  .phone {
-    width: 100%; max-width: 372px; height: 700px; margin: 0 auto; border-radius: 42px; border: 8px solid #000;
-    background: radial-gradient(120% 70% at 50% 0%, #26308f 0%, var(--ink) 45%, var(--night) 100%);
-    box-shadow: 8px 8px 0 var(--gold); position: relative; overflow: hidden; display: flex; flex-direction: column;
-  }
+  /* modal */
+  .scrim { position: fixed; inset: 0; background: rgba(7,10,34,.75); display: grid; place-items: center; z-index: 50; padding: 16px; }
+  .dlg { background: var(--white); color: var(--night); border: 3px solid var(--night); border-radius: 18px; box-shadow: 8px 8px 0 var(--cobalt); width: min(480px, 100%); padding: 20px; }
+  .dlg h2 { margin: 0 0 12px; font-family: var(--display); font-weight: 400; font-size: 26px; }
+  .dlg fieldset { border: 0; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+  .dlg legend { font-weight: 700; margin-bottom: 6px; }
+  .dlg label.o { display: flex; gap: 10px; align-items: center; min-height: 48px; padding: 8px 12px; border: 2px solid var(--night); border-radius: 12px; cursor: pointer; }
+  .dlg label.o input { width: 22px; height: 22px; }
+  .dlg textarea { width: 100%; min-height: 84px; border: 2px solid var(--night); border-radius: 12px; padding: 10px; font: inherit; }
+  .dlg .fr { margin: 0 0 10px; font-weight: 700; }
+  .dlg .btns { display: flex; gap: 10px; margin-top: 14px; }
+  .dlg .btns button { flex: 1; min-height: 52px; border-radius: 12px; border: 3px solid var(--night); font-weight: 700; font-size: 17px; background: var(--white); }
+  .dlg .btns .go { background: var(--gold); box-shadow: 0 3px 0 #a67f00; }
+
+  /* ===== Phone (the product) ===== */
+  .phone-col { justify-self: center; width: 100%; max-width: 400px; }
+  .phone { width: 100%; max-width: 372px; height: 700px; margin: 0 auto; border-radius: 42px; border: 8px solid #000; background: radial-gradient(120% 70% at 50% 0%, #26308f 0%, var(--ink) 45%, var(--night) 100%); box-shadow: 8px 8px 0 var(--gold); overflow: hidden; display: flex; flex-direction: column; }
   .notch { height: 30px; display: flex; justify-content: center; align-items: flex-end; font-size: 12px; color: var(--steel); padding-bottom: 2px; }
   .screen { flex: 1; display: none; flex-direction: column; padding: 8px 18px 22px; }
   .screen.show { display: flex; }
-
-  .who { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .who strong { font-family: var(--display); font-size: 22px; }
-  .pill { font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--ok); color: #04281c; }
-
-  /* idle */
-  .idle-mid { flex: 1; display: grid; place-content: center; text-align: center; gap: 8px; }
-  .idle-mid .big { font-family: var(--display); font-size: 40px; line-height: 1.05; }
-  .idle-mid .small { color: var(--steel); font-size: 16px; max-width: 24ch; margin: 0 auto; }
-  .weekline { background: rgba(255,255,255,.08); border-radius: 14px; padding: 12px 14px; font-size: 15px; }
-  .weekline b { font-family: var(--display); font-weight: 400; font-size: 20px; color: var(--gold); }
-
-  /* ping */
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .top strong { font-family: var(--display); font-weight: 400; font-size: 22px; }
+  .pill { min-height: 40px; font-size: 14px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 0; background: var(--ok); color: #04281c; pointer-events: none; }
+  .interactive .pill { pointer-events: auto; }
+  .pill.off { background: var(--steel); color: var(--night); }
+  .mid { flex: 1; display: grid; place-content: center; text-align: center; gap: 8px; }
+  .mid .big { font-family: var(--display); font-size: 40px; line-height: 1.05; }
+  .mid .small { color: var(--steel); font-size: 17px; max-width: 24ch; margin: 0 auto; }
   .alert { background: var(--alarm); color: var(--white); font-family: var(--display); font-size: 18px; text-align: center; padding: 10px; border-radius: 12px; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(255,59,79,.3); } }
-  .job { margin: 14px 0 0; font-size: 22px; font-weight: 700; line-height: 1.25; }
-  .where { color: var(--steel); font-size: 16px; margin: 2px 0 0; }
-  .ringwrap { position: relative; width: 190px; height: 190px; margin: 14px auto 0; }
-  .ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ringwrap .track { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 14; }
-  .ringwrap .go { fill: none; stroke: var(--gold); stroke-width: 14; stroke-linecap: round; stroke-dasharray: 534; stroke-dashoffset: 0; }
-  .ringwrap .go.low { stroke: var(--alarm); }
-  .ringwrap .num { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
-  .ringwrap .num b { font-family: var(--display); font-size: 64px; line-height: 1; font-weight: 400; }
-  .ringwrap .num span { color: var(--steel); font-size: 14px; }
-  .acts { margin-top: auto; display: grid; gap: 10px; padding-top: 12px; }
+  .job { margin: 12px 0 0; font-size: 21px; font-weight: 700; line-height: 1.25; }
+  .where { color: var(--steel); margin: 2px 0 0; }
+  .ringwrap { position: relative; width: 176px; height: 176px; margin: 12px auto 0; }
+  .ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+  .track2 { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 14; }
+  .go { fill: none; stroke: var(--gold); stroke-width: 14; stroke-linecap: round; stroke-dasharray: 478; }
+  .go.low { stroke: var(--alarm); }
+  .num { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .num b { font-family: var(--display); font-size: 60px; line-height: 1; font-weight: 400; }
+  .num span { color: var(--steel); font-size: 14px; }
+  .acts { margin-top: auto; display: grid; gap: 10px; padding-top: 10px; }
   .take { min-height: 96px; border: 0; border-radius: 22px; background: var(--gold); color: var(--night); font-family: var(--display); font-size: 36px; box-shadow: 0 6px 0 #a67f00; }
   .take:active { transform: translateY(4px); box-shadow: 0 2px 0 #a67f00; }
   .pass { min-height: 64px; border-radius: 18px; border: 3px solid var(--steel); background: transparent; color: var(--white); font-weight: 700; font-size: 20px; }
+  .res .big { font-family: var(--display); font-size: 46px; line-height: 1.05; }
+  .res.m .big { color: var(--alarm); }
+  .res p, .on p { margin: 0; color: var(--steel); font-size: 17px; max-width: 24ch; margin-inline: auto; }
+  .on .big { font-family: var(--display); font-size: 40px; color: var(--ok); line-height: 1.05; }
+  .on .job2 { font-weight: 700; font-size: 19px; max-width: 26ch; margin: 6px auto 0; }
+  .done { min-height: 64px; border-radius: 18px; border: 0; background: var(--cobalt); color: var(--white); font-weight: 700; font-size: 20px; margin-top: auto; pointer-events: none; }
+  .interactive .done { pointer-events: auto; }
 
-  /* result */
-  .result { flex: 1; display: grid; place-content: center; text-align: center; gap: 10px; }
-  .result .big { font-family: var(--display); font-size: 46px; line-height: 1.05; }
-  .result p { margin: 0; color: var(--steel); font-size: 17px; max-width: 24ch; margin-inline: auto; }
-  .result.t .big { color: var(--gold); }
-  .result.m .big { color: var(--alarm); }
-  .back { min-height: 64px; border-radius: 18px; border: 0; background: var(--cobalt); color: var(--white); font-weight: 700; font-size: 20px; margin-top: auto; }
-
-  .demo { margin-top: 18px; display: grid; gap: 8px; max-width: 372px; margin-inline: auto; }
-  .demo button { min-height: 56px; border-radius: 14px; border: 3px solid var(--gold); background: var(--night); color: var(--gold); font-weight: 700; font-size: 18px; }
-  .demo button:disabled { opacity: .4; cursor: not-allowed; }
-  .demo p { margin: 0; color: var(--steel); font-size: 13px; text-align: center; }
-
-  @media (prefers-reduced-motion: reduce) { .alert, .stat.flash { animation: none; } }
+  /* success screen */
+  #sc-win { position: relative; overflow: hidden; padding: 0; }
+  .win { position: relative; flex: 1; display: grid; place-content: center; text-align: center; gap: 10px; animation: shake .5s .25s 2; }
+  .rays { position: absolute; left: 50%; top: 42%; width: 900px; height: 900px; margin: -450px 0 0 -450px;
+    background: repeating-conic-gradient(from 0deg, rgba(255,196,0,.55) 0 8deg, transparent 8deg 24deg);
+    -webkit-mask: radial-gradient(circle, #000 0, transparent 62%); mask: radial-gradient(circle, #000 0, transparent 62%);
+    animation: spin 5s linear infinite, rayin .5s ease-out both; }
+  .flashw { position: absolute; inset: 0; background: #fff; opacity: 0; animation: flashw .6s ease-out; pointer-events: none; }
+  .badge { position: relative; width: 150px; height: 170px; margin: 0 auto; display: grid; place-content: center; font-family: var(--display); font-size: 84px; color: var(--night);
+    background: var(--gold); clip-path: polygon(50% 0, 100% 14%, 100% 58%, 50% 100%, 0 58%, 0 14%); animation: pop .7s cubic-bezier(.2,1.6,.4,1) both; }
+  .badge::after { content: ""; position: absolute; inset: 9px; background: var(--cobalt); clip-path: polygon(50% 0, 100% 14%, 100% 58%, 50% 100%, 0 58%, 0 14%); z-index: -1; }
+  .badge span { color: var(--white); text-shadow: 0 3px 0 var(--night); }
+  .slam { position: relative; font-family: var(--display); font-size: 46px; line-height: 1; color: var(--white); text-shadow: 0 4px 0 var(--cobalt), 0 8px 0 var(--night); animation: slam .55s .3s cubic-bezier(.2,1.8,.4,1) both; }
+  .slam small { display: block; margin-top: 12px; font-family: var(--body); font-weight: 700; font-size: 18px; color: var(--gold); text-shadow: none; }
+  .star { position: absolute; left: 50%; top: 42%; width: 22px; height: 22px; margin: -11px; background: var(--gold); clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); opacity: 0; animation: fly 1.5s .15s ease-out both; }
+  .star:nth-child(3n) { background: var(--alarm); } .star:nth-child(3n+1) { background: var(--cobalt); } .star:nth-child(4n) { background: #fff; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes rayin { from { opacity: 0; transform: scale(.2); } }
+  @keyframes flashw { 0% { opacity: .9; } 100% { opacity: 0; } }
+  @keyframes pop { 0% { transform: scale(0) rotate(-25deg); } 100% { transform: scale(1) rotate(0); } }
+  @keyframes slam { 0% { transform: scale(3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes fly { 0% { opacity: 1; transform: translate(0,0) scale(.4); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.3) rotate(240deg); } }
+  @keyframes shake { 0%,100% { transform: translate(0); } 25% { transform: translate(-5px, 3px); } 75% { transform: translate(5px, -3px); } }
+  @media (prefers-reduced-motion: reduce) { .alert, .win, .rays, .badge, .slam, .star, .flashw { animation: none; } .star { display: none; } .badge, .slam { opacity: 1; } }
 </style>
 </head>
 <body>
 
-<div class="bar">
-  <div>
-    <h1>Rook Dispatch 4.2 fix</h1>
-    <p>Prototype with replay figures from the brief. Not live data.</p>
+<nav class="nav" aria-label="Prototype pages">
+  <h1>Rook Dispatch 4.2 fix · prototype</h1>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab1" aria-selected="true" data-page="1">1 · 4.2 today</button>
+    <button role="tab" id="tab2" aria-selected="false" data-page="2">2 · After the fix</button>
+    <button role="tab" id="tab3" aria-selected="false" data-page="3">3 · Try it</button>
   </div>
-  <div class="switch" role="group" aria-label="Version to show">
-    <button type="button" id="m-today" aria-pressed="true">4.2 today</button>
-    <button type="button" id="m-fixed" aria-pressed="false">After the fix</button>
-  </div>
-</div>
+</nav>
+<p class="note" id="note"></p>
 
 <main class="stage" id="stage">
-
-  <!-- Handler console -->
   <section aria-label="Handler console">
-    <p class="caption">Handler console, on a desk. Linda Pruitt is looking at Farlight.</p>
-    <div class="console">
+    <p class="cap">Handler console</p>
+    <div class="console" id="console">
       <header>
-        <strong>Rook Dispatch · Console</strong>
-        <span>Handler: Linda Pruitt</span>
+        <strong>Rook Dispatch</strong>
+        <div class="hr">
+          <span class="who">Linda Pruitt · Handler</span>
+          <span class="tnote" id="tnote" aria-live="polite"></span>
+          <button class="tkt" id="tkt" type="button">Submit a ticket</button>
+        </div>
       </header>
-      <div class="body">
-
-        <div class="banner bad" id="banner">
-          <h2 id="b-h">Farlight is barely being asked.</h2>
-          <p id="b-p">Pinged on 6 of 31 Uptown callouts since 12 Aug. Before 4.2: 59 of 59.</p>
+      <div class="cbody">
+        <div class="resp">
+          <div><h2>Farlight</h2><p>Uptown</p></div>
+          <span class="chip" id="chip">Available</span>
         </div>
-
+        <div class="perf">
+          <div class="stat"><div class="k">Routing score</div><div class="v" id="v-score">0.50</div><div class="gauge" role="img" aria-label="Routing score out of 1"><i id="gauge"></i></div><div class="sc" id="sc-d"></div></div>
+          <div class="stat"><div class="k">Misses in a row</div><div class="v" id="v-streak">0</div></div>
+        </div>
         <div class="stats">
-          <div class="stat" id="s-score"><div class="k">Routing score</div><div class="v" id="v-score">0.00</div><div class="n" id="n-score">Floor is 0. Only a yes earns it back.</div></div>
-          <div class="stat" id="s-rate"><div class="k">Pings a day</div><div class="v" id="v-rate">0.5</div><div class="n" id="n-rate">Was about 1.7 before 4.2.</div></div>
-          <div class="stat" id="s-wait"><div class="k">Ping wait</div><div class="v" id="v-wait">60s</div><div class="n" id="n-wait">Cut from 90s in 4.2.</div></div>
-          <div class="stat" id="s-streak"><div class="k">Misses in a row</div><div class="v" id="v-streak">0</div><div class="n" id="n-streak">Every miss costs 0.12.</div></div>
+          <div class="stat"><div class="k">Pings today</div><div class="v" id="s-p">0</div></div>
+          <div class="stat"><div class="k">Taken</div><div class="v" id="s-t">0</div></div>
+          <div class="stat"><div class="k">Turned down</div><div class="v" id="s-d">0</div></div>
+          <div class="stat"><div class="k">Missed</div><div class="v" id="s-m">0</div></div>
         </div>
-
-        <div class="two">
-          <div class="panel">
-            <h3>Farlight's pings each week</h3>
-            <div class="chart" id="chart"><div class="target" id="target"><b>Target: about 12 a week</b></div></div>
-            <div class="labels" id="labels"></div>
-            <p class="legend">Red bars are after 4.2 shipped on 12 Aug. Real ping counts, 29 Jun to 6 Sep.</p>
-          </div>
-          <div class="panel">
-            <h3>How a missed ping is scored</h3>
-            <ul class="rule" id="rule"></ul>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Farlight's pings, live from this prototype</h3>
+        <div class="panel fill">
+          <h3>Uptown callouts</h3>
           <ul class="feed" id="feed" aria-live="polite"></ul>
-          <p class="empty" id="empty">No pings yet. Use "Send a test ping" under the phone.</p>
+          <p class="empty" id="empty">No callouts yet today.</p>
         </div>
-
       </div>
+      <div class="toast" id="toast" hidden>Ticket submitted</div>
     </div>
   </section>
 
-  <!-- Responder phone -->
   <section class="phone-col" aria-label="Responder phone">
-    <p class="caption">Farlight's phone. Built for one thumb, mid-rescue.</p>
-    <div class="phone">
+    <p class="cap">Farlight's phone</p>
+    <div class="phone" id="phone">
       <div class="notch">Rook</div>
 
       <div class="screen show" id="sc-idle">
-        <div class="who"><strong>Farlight</strong><span class="pill">Available</span></div>
-        <div class="idle-mid">
-          <div class="big" id="i-big">All quiet.</div>
-          <p class="small" id="i-small">Uptown. Callouts land here.</p>
-        </div>
-        <div class="weekline" id="i-week">Pings this week: <b>1</b></div>
+        <div class="top"><strong>Farlight</strong><button class="pill" id="pill" type="button">Available</button></div>
+        <div class="mid"><div class="big">All quiet.</div><p class="small">No callouts right now.</p></div>
       </div>
 
       <div class="screen" id="sc-ping">
         <div class="alert">CALLOUT · UPTOWN</div>
-        <p class="job">Three men in matching capes are emptying a bank.</p>
+        <p class="job" id="p-job"></p>
         <p class="where">Uptown</p>
         <div class="ringwrap">
-          <svg viewBox="0 0 190 190" aria-hidden="true"><circle class="track" cx="95" cy="95" r="85"/><circle class="go" id="ring" cx="95" cy="95" r="85"/></svg>
-          <div class="num"><b id="count" aria-live="off">60</b><span>seconds left</span></div>
+          <svg viewBox="0 0 176 176" aria-hidden="true"><circle class="track2" cx="88" cy="88" r="76"/><circle class="go" id="ring" cx="88" cy="88" r="76"/></svg>
+          <div class="num"><b id="count">60</b><span>seconds left</span></div>
         </div>
         <div class="acts">
           <button class="take" id="take" type="button">TAKE IT</button>
@@ -264,153 +263,386 @@
       </div>
 
       <div class="screen" id="sc-res">
-        <div class="result" id="res">
-          <div class="big" id="r-big">Taken.</div>
-          <p id="r-p">The callout is yours.</p>
+        <div class="mid res" id="res"><div class="big" id="r-big">Passed.</div><p id="r-p"></p></div>
+      </div>
+
+      <div class="screen" id="sc-win" aria-live="polite">
+        <div class="win">
+          <div class="rays"></div>
+          <div class="star" style="--x:-130px;--y:-150px"></div><div class="star" style="--x:140px;--y:-130px"></div>
+          <div class="star" style="--x:-160px;--y:20px"></div><div class="star" style="--x:165px;--y:40px"></div>
+          <div class="star" style="--x:-90px;--y:170px"></div><div class="star" style="--x:100px;--y:190px"></div>
+          <div class="star" style="--x:0;--y:-210px"></div><div class="star" style="--x:-60px;--y:-90px"></div>
+          <div class="star" style="--x:70px;--y:-70px"></div><div class="star" style="--x:-150px;--y:-60px"></div>
+          <div class="star" style="--x:150px;--y:-10px"></div><div class="star" style="--x:0;--y:200px"></div>
+          <div class="badge"><span>&#10003;</span></div>
+          <div class="slam">CRISIS<br>AVERTED!<small>Uptown is safe.</small></div>
+          <div class="flashw"></div>
         </div>
-        <button class="back" id="back" type="button">Back to ready</button>
+      </div>
+
+      <div class="screen" id="sc-on">
+        <div class="mid on"><div class="big">You're on it.</div><p class="job2" id="o-job"></p></div>
+        <button class="done" id="done" type="button">Crisis averted</button>
       </div>
     </div>
 
-    <div class="demo">
-      <button type="button" id="send">Send a test ping</button>
-      <p>The demo runs the countdown at 6× speed. Let it run out to see a miss.</p>
+    <div class="sim" id="sim" hidden>
+      <button type="button" id="send">Simulate a callout</button>
+      <p>Prototype control. The 90-second countdown runs at 6× speed.</p>
+    </div>
+    <div class="bts" id="bts" hidden>
+      <h3>Behind the scenes · not shown in the product</h3>
+      <p>Taken +0.08. Turned down −0.12. Missed: the first 2 in a row cost 0, the 3rd and later cost 0.06. Any answer resets the count.</p>
     </div>
   </section>
 </main>
 
+<section class="tl" id="tl" aria-label="Day timeline">
+  <div class="tlbox">
+    <div class="tlrow">
+      <div class="clock" id="clock">08:00</div>
+      <button class="ctl" id="play" type="button">Pause</button>
+      <button class="ctl alt" id="replay" type="button">Replay the day</button>
+      <p class="narr" id="narr" aria-live="polite"></p>
+    </div>
+    <div class="track" id="track" aria-label="Click to jump to a time">
+      <div class="rail"></div>
+      <div id="ticks"></div>
+      <div id="busyl"></div>
+      <div id="mks"></div>
+      <div class="head" id="head"></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>Farlight takes it</span>
+      <span><i style="background:var(--gold)"></i>Farlight turns it down</span>
+      <span><i style="background:var(--alarm)"></i>Farlight misses it</span>
+      <span><i style="background:var(--steel)"></i>Farlight is not asked</span>
+      <span><i style="background:var(--cobalt);border-radius:3px"></i>Ticket</span>
+      <span><i style="background:var(--ok);width:22px;height:6px;border-radius:3px"></i>Farlight on a callout</span>
+    </div>
+  </div>
+</section>
+
+<div class="scrim" id="scrim" hidden>
+  <form class="dlg" id="form" role="dialog" aria-modal="true" aria-labelledby="dt">
+    <h2 id="dt">Submit a ticket</h2>
+    <p class="fr">Responder: Farlight</p>
+    <fieldset>
+      <legend>What's wrong?</legend>
+      <label class="o"><input type="radio" name="k" value="quiet" checked> Their phone isn't ringing</label>
+      <label class="o"><input type="radio" name="k" value="gone"> Callouts expire before they can answer</label>
+      <label class="o"><input type="radio" name="k" value="other"> Something else</label>
+    </fieldset>
+    <label for="det" style="font-weight:700">Details (optional)</label>
+    <textarea id="det"></textarea>
+    <div class="btns"><button type="button" id="cancel">Cancel</button><button type="submit" class="go">Submit ticket</button></div>
+  </form>
+</div>
+
 <script>
 (function () {
-  var SPEED = 6;
-  var WEEKS = [["29 Jun",12],["6 Jul",12],["13 Jul",11],["20 Jul",12],["27 Jul",13],["3 Aug",12],["10 Aug",10],["17 Aug",3],["24 Aug",1]];
-  var MODES = {
-    today: { wait: 60, start: 0 },
-    fixed: { wait: 90, start: 0.5 }
-  };
-  var mode = "today", score = 0, streak = 0, feed = [], timer = null, t0 = 0, active = false;
-
   function $(id) { return document.getElementById(id); }
-  function fmt(n) { return n.toFixed(2); }
+  var C = 2 * Math.PI * 76;
+  var T = {
+    A: "Two brothers in welding masks have taken over the announcements at the train station.",
+    B: "A man who says he is from the year 2091 has locked the doors of the clock tower from the inside.",
+    C: "A man in a suit made of mirrors is removing the doors from the courthouse.",
+    D: "A man wearing a crown of antlers is redirecting traffic on the ring road.",
+    E: "Three men in matching capes are emptying a bank.",
+    F: "A pastry chef is redirecting traffic on the ring road."
+  };
+  var CLOCK0 = 8 * 60, DAY = 480;
+  function hhmm(m) { var t = CLOCK0 + Math.floor(m); var h = Math.floor(t / 60), mm = t % 60; return (h < 10 ? "0" : "") + h + ":" + (mm < 10 ? "0" : "") + mm; }
 
-  // chart
-  var chart = $("chart"), labels = $("labels"), maxW = 14;
-  WEEKS.forEach(function (w, i) {
-    var col = document.createElement("div");
-    col.className = "col" + (i >= 6 ? " after" : "");
-    col.innerHTML = '<span class="num">' + w[1] + '</span><div class="bar-v" style="height:' + Math.round(w[1] / maxW * 110) + 'px"></div>';
-    chart.insertBefore(col, $("target"));
-    var l = document.createElement("span"); l.textContent = w[0]; labels.appendChild(l);
-  });
-  $("target").style.bottom = Math.round(12 / maxW * 110 + 0) + "px";
+  var NOTE = {
+    1: "<b>Page 1 · 4.2 today.</b> One working day for Farlight and Linda, fast-forwarded to about 20 seconds. Built from Farlight's real pattern since 12 Aug (asked on about 1 in 5 Uptown callouts). Answer times are assumed: we have no response-time data.",
+    2: "<b>Page 2 · After the fix.</b> The same three callouts, with the fix in place: Farlight is asked first again, the wait is 90 seconds, and early misses are free. Projected from replays, not live data.",
+    3: "<b>Page 3 · Try it.</b> The product after the fix. Simulate a callout, then take it, pass, or let it run out. Click the ticket button or Farlight's status on the phone."
+  };
 
-  function flash(id) {
-    var el = $(id); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
-  }
+  /* ---------- Day scripts ---------- */
+  var DAYS = {
+    1: { wait: 60, start: 0, rule: { take: 0.08, turned: -0.12, miss: function () { return -0.12; } }, events: [
+      { type: "callout", min: 72, dwell: 1.8, text: T.A, pings: [{ who: "Cindermark", out: "taken" }], f: null,
+        say: "09:12 Cindermark is asked first. Farlight is not asked." },
+      { type: "callout", min: 185, dwell: 4.2, text: T.B, pings: [{ who: "Farlight", out: "missed" }, { who: "Sgt. Bulwark", out: "taken" }], f: { answerSec: null, out: "missed" },
+        say: "11:05 Farlight's phone buzzes. The 60-second wait ends before Farlight can answer, so it counts as a miss." },
+      { type: "callout", min: 330, dwell: 1.8, text: T.C, pings: [{ who: "Sgt. Bulwark", out: "taken" }], f: null,
+        say: "13:30 Sgt. Bulwark is asked first. Farlight is not asked." },
+      { type: "ticket", min: 380, dwell: 2.2, say: "14:20 Linda files a ticket: Farlight's phone has gone quiet." }
+    ], end: "End of day: Farlight was asked once and took nothing." },
+    2: { wait: 90, start: 0.5, rule: { take: 0.08, turned: -0.12, miss: function (n) { return n >= 3 ? -0.06 : 0; } }, events: [
+      { type: "callout", min: 72, dwell: 3.8, text: T.A, pings: [{ who: "Farlight", out: "taken" }], f: { answerSec: 40, out: "taken" }, busy: 75,
+        say: "09:12 Farlight is asked first and takes it in 40 seconds." },
+      { type: "callout", min: 185, dwell: 4.2, text: T.B, pings: [{ who: "Farlight", out: "taken" }], f: { answerSec: 70, out: "taken" }, busy: 60,
+        say: "11:05 Farlight answers in 70 seconds. Under the 60-second wait this would have been a miss." },
+      { type: "callout", min: 330, dwell: 3.8, text: T.C, pings: [{ who: "Farlight", out: "turned" }, { who: "Cindermark", out: "taken" }], f: { answerSec: 25, out: "turned" },
+        say: "13:30 Farlight turns this one down and Cindermark takes it. A turn-down still counts, and Farlight's score stays healthy." }
+    ], end: "End of day: Farlight was asked 3 times and took 2." }
+  };
 
-  function renderStatic() {
-    var fixed = mode === "fixed";
-    $("stage").classList.toggle("on-fixed", fixed);
-    $("m-today").setAttribute("aria-pressed", String(!fixed));
-    $("m-fixed").setAttribute("aria-pressed", String(fixed));
-    var b = $("banner");
-    b.className = "banner " + (fixed ? "good" : "bad");
-    $("b-h").textContent = fixed ? "Farlight is back in line." : "Farlight is barely being asked.";
-    $("b-p").textContent = fixed
-      ? "Expected: pinged on Uptown callouts again, about 1.7 a day. A closer neighbor may still go first. Replay estimate."
-      : "Pinged on 6 of 31 Uptown callouts since 12 Aug. Before 4.2: 59 of 59.";
-    $("v-rate").textContent = fixed ? "~1.7" : "0.5";
-    $("n-rate").textContent = fixed ? "Expected after the fix and a one-time reset." : "Was about 1.7 before 4.2.";
-    $("v-wait").textContent = MODES[mode].wait + "s";
-    $("n-wait").textContent = fixed ? "Back to 90s. Fewer 'gone before I could answer'." : "Cut from 90s in 4.2.";
-    $("n-streak").textContent = fixed ? "First 2 are free. The 3rd and later cost 0.06." : "Every miss costs 0.12.";
-    $("rule").innerHTML = fixed
-      ? '<li class="pos"><span>Taken</span><b>+0.08</b></li><li class="neg"><span>Turned down</span><b>-0.12</b></li><li class="zero"><span>Missed: 1st and 2nd in a row</span><b>0</b></li><li class="neg"><span>Missed: 3rd and later</span><b>-0.06</b></li><li class="zero"><span>Any answer</span><b>resets count</b></li>'
-      : '<li class="pos"><span>Taken</span><b>+0.08</b></li><li class="neg"><span>Turned down</span><b>-0.12</b></li><li class="neg"><span>Missed</span><b>-0.12</b></li><li class="zero"><span>Nothing fades a score</span><b>ever</b></li>';
-    $("i-big").textContent = fixed ? "Ready." : "All quiet.";
-    $("i-small").textContent = fixed ? "Uptown. Your next callout lands here." : "Uptown. Callouts land here.";
-    $("i-week").innerHTML = fixed ? 'Pings per week: <b>~12</b> expected' : 'Pings this week: <b>1</b>';
-    $("count").textContent = MODES[mode].wait;
-  }
-
-  function renderLive() {
-    $("v-score").textContent = fmt(score);
-    $("v-streak").textContent = streak;
-    var s = $("n-score");
-    s.textContent = mode === "fixed"
-      ? (score === 0.5 ? "Reset once to 0.50." : "Live in this prototype.")
-      : (score === 0 ? "Floor is 0. Only a yes earns it back." : "Live in this prototype.");
-    var f = $("feed"); f.innerHTML = "";
-    feed.slice().reverse().forEach(function (e) {
-      var li = document.createElement("li"); li.className = e.cls;
-      li.innerHTML = '<span aria-hidden="true">●</span><div><div class="what">' + e.what + '</div><div class="sub">' + e.sub + '</div></div><span class="d">' + e.d + '</span>';
-      f.appendChild(li);
+  function buildSegs(day) {
+    var dw = 0; day.events.forEach(function (e) { dw += e.dwell; });
+    var rate = DAY / (20 - dw), segs = [], u = 0, prev = 0;
+    day.events.forEach(function (e) {
+      var fast = (e.min - prev) / rate;
+      segs.push({ k: "fast", u0: u, u1: u + fast, m0: prev, m1: e.min }); u += fast;
+      segs.push({ k: "dwell", u0: u, u1: u + e.dwell, m: e.min, ev: e }); u += e.dwell; prev = e.min;
     });
-    $("empty").style.display = feed.length ? "none" : "block";
+    var last = (DAY - prev) / rate;
+    segs.push({ k: "fast", u0: u, u1: u + last, m0: prev, m1: DAY }); u += last;
+    day.segs = segs; day.total = u;
   }
+  buildSegs(DAYS[1]); buildSegs(DAYS[2]);
 
-  function reset() {
-    clearInterval(timer); active = false;
-    score = MODES[mode].start; streak = 0; feed = [];
-    show("sc-idle"); $("send").disabled = false;
-    renderStatic(); renderLive();
+  /* ---------- Rendering the product from a world object ---------- */
+  function blank() { return { status: "Available", screen: "idle", left: 0, total: 60, job: "", res: null, stats: { p: 0, t: 0, d: 0, m: 0 }, score: 0.5, start: 0.5, streak: 0, feed: [], off: false, tnote: "", pressed: false, toast: false }; }
+
+  function chipHTML(c) {
+    var label = c.out === "taken" ? "taken" : c.out === "turned" ? "turned down" : c.out === "missed" ? "missed" : "asking…";
+    return '<span class="pc ' + (c.out || "wait") + '">' + c.who + " · " + label + "</span>";
   }
-
-  function show(id) {
-    ["sc-idle", "sc-ping", "sc-res"].forEach(function (s) { $(s).classList.toggle("show", s === id); });
-  }
-
-  function clamp(v) { return Math.max(0, Math.min(1, Math.round(v * 100) / 100)); }
-
-  function finish(kind) {
-    if (!active) return;
-    clearInterval(timer); active = false;
-    var before = score, delta = 0, what, cls, sub, rb, rp, rc;
-    if (kind === "take") {
-      delta = 0.08; streak = 0; what = "Taken"; cls = "taken"; sub = "Answered in time. Count resets.";
-      rb = "Taken."; rp = "The callout is yours. Go."; rc = "t";
-    } else if (kind === "pass") {
-      delta = -0.12; streak = 0; what = "Turned down"; cls = "turned"; sub = "Passed. Count resets.";
-      rb = "Passed."; rp = "It moved to the next responder."; rc = "";
-    } else {
-      streak += 1; what = "Missed"; cls = "missed";
-      if (mode === "fixed") {
-        delta = streak >= 3 ? -0.06 : 0;
-        sub = streak >= 3 ? "Miss number " + streak + " in a row. Costs 0.06." : "Miss number " + streak + " in a row. Free.";
-      } else { delta = -0.12; sub = "Counted as a decline. Costs 0.12."; }
-      rb = "Missed."; rp = "The wait ran out. It moved on."; rc = "m";
+  function render(w) {
+    $("chip").textContent = w.status;
+    $("chip").className = "chip" + (w.status === "Being pinged" ? " pinged" : w.status === "On callout" ? " oncall" : w.status === "Off duty" ? " off" : "");
+    $("s-p").textContent = w.stats.p; $("s-t").textContent = w.stats.t; $("s-d").textContent = w.stats.d; $("s-m").textContent = w.stats.m;
+    var f = $("feed"), html = "";
+    w.feed.forEach(function (e) {
+      var dl = "";
+      if (e.delta !== undefined) dl = '<span class="dl ' + (e.delta > 0 ? "up" : e.delta < 0 ? "down" : "") + '">' + (e.delta === 0 ? "Score unchanged" : "Score " + (e.delta > 0 ? "+" : "−") + Math.abs(e.delta).toFixed(2)) + "</span>";
+      html += "<li><div class=\"t\">" + e.time + '</div><div class="x">' + e.text + '</div><div class="chips">' + e.chips.map(chipHTML).join('<span class="arrow">›</span>') + dl + "</div></li>";
+    });
+    if (html !== f._html) { var keep = f.scrollTop; f.innerHTML = html; f._html = html; f.scrollTop = keep; }
+    $("empty").hidden = w.feed.length > 0;
+    $("v-score").textContent = w.score.toFixed(2); $("v-streak").textContent = w.streak;
+    $("gauge").style.width = Math.round(w.score * 100) + "%";
+    var dd = Math.round((w.score - w.start) * 100) / 100;
+    $("sc-d").textContent = dd === 0 ? "Unchanged since the start of the day" : (dd > 0 ? "Up " : "Down ") + Math.abs(dd).toFixed(2) + " since the start of the day";
+    ["idle", "ping", "res", "on", "win"].forEach(function (s) { $("sc-" + s).classList.toggle("show", w.screen === s); });
+    var p = $("pill"); p.textContent = w.off ? "Off duty" : "Available"; p.classList.toggle("off", w.off); p.setAttribute("aria-pressed", String(w.off));
+    if (w.screen === "ping") {
+      $("p-job").textContent = w.job;
+      $("count").textContent = Math.ceil(w.left);
+      $("ring").style.strokeDashoffset = C * (1 - w.left / w.total);
+      $("ring").classList.toggle("low", w.left / w.total < 0.25);
     }
-    score = clamp(score + delta);
-    var shown = Math.round((score - before) * 100) / 100;
-    feed.push({ what: what, cls: cls, sub: sub + (before === 0 && shown === 0 && kind !== "take" ? " Already at the floor." : ""), d: (shown > 0 ? "+" : "") + fmt(shown) });
-    $("res").className = "result " + rc; $("r-big").textContent = rb; $("r-p").textContent = rp;
-    show("sc-res"); $("send").disabled = false;
-    renderLive(); flash("s-score"); flash("s-streak");
+    if (w.screen === "res") { $("r-big").textContent = w.res.big; $("r-p").textContent = w.res.p; $("res").classList.toggle("m", w.res.cls === "m"); }
+    if (w.screen === "on") $("o-job").textContent = w.job;
+    $("tnote").textContent = w.tnote; $("tkt").classList.toggle("pressed", w.pressed);
+    $("toast").hidden = !w.toast;
   }
 
-  function ping() {
-    if (active) return;
-    active = true; $("send").disabled = true;
-    var wait = MODES[mode].wait; t0 = Date.now();
-    show("sc-ping");
-    var ring = $("ring"), count = $("count"), C = 534;
-    ring.classList.remove("low"); ring.style.strokeDashoffset = 0; count.textContent = wait;
-    timer = setInterval(function () {
-      var left = wait - (Date.now() - t0) / 1000 * SPEED;
-      if (left <= 0) { finish("miss"); return; }
-      count.textContent = Math.ceil(left);
-      ring.style.strokeDashoffset = C * (1 - left / wait);
-      ring.classList.toggle("low", left < 15);
+  /* ---------- Page 1 and 2: the day player ---------- */
+  var page = 1, day = DAYS[1], u = 0, playing = false, last = 0, raf = 0;
+
+  function simAt(uu) {
+    for (var i = 0; i < day.segs.length; i++) {
+      var s = day.segs[i];
+      if (uu < s.u1 || i === day.segs.length - 1) {
+        if (s.k === "fast") { var f = s.u1 > s.u0 ? Math.min(1, (uu - s.u0) / (s.u1 - s.u0)) : 1; return s.m0 + f * (s.m1 - s.m0); }
+        return s.m;
+      }
+    }
+    return DAY;
+  }
+  function uFor(m) {
+    for (var i = 0; i < day.segs.length; i++) {
+      var s = day.segs[i];
+      if (s.k === "fast" && m >= s.m0 && m <= s.m1) return s.u0 + (s.m1 > s.m0 ? (m - s.m0) / (s.m1 - s.m0) : 0) * (s.u1 - s.u0);
+    }
+    return 0;
+  }
+
+  function dayWorld(uu) {
+    var w = blank(), sim = simAt(uu), wait = day.wait, active = null, say = "", busyUntil = -1, lastJob = "", rule = day.rule;
+    w.total = wait; w.score = day.start; w.start = day.start;
+    day.segs.forEach(function (s) {
+      if (s.k !== "dwell") return;
+      var e = s.ev;
+      if (uu < s.u0) return;
+      var done = uu >= s.u1, p = done ? 1 : (uu - s.u0) / (s.u1 - s.u0);
+      say = e.say;
+      if (e.type === "ticket") {
+        w.pressed = p < 0.35 && !done;
+        w.tnote = (p >= 0.35 || done) ? "Ticket submitted " + hhmm(e.min) : "";
+        w.toast = (uu - s.u0) > 0.5 && (uu - s.u0) < s.u1 - s.u0 + 1.4;
+        return;
+      }
+      var entry = { time: hhmm(e.min), text: e.text, chips: [] };
+      var ans = e.f && e.f.answerSec != null && e.f.answerSec < wait ? e.f.answerSec / wait * 0.75 : 0.75;
+      e.pings.forEach(function (pg, i) {
+        var isF = pg.who === "Farlight";
+        var appear = i === 0 ? 0 : (e.f ? ans : 0.5);
+        var resolve = isF ? ans : (i === 0 ? 0.6 : 0.95);
+        if (p >= appear) entry.chips.push({ who: pg.who, out: p >= resolve ? pg.out : null });
+        if (isF && p >= appear) {
+          w.stats.p += 1;
+          if (p >= resolve || done) {
+            var d;
+            if (pg.out === "taken") { w.stats.t++; w.streak = 0; d = rule.take; }
+            else if (pg.out === "turned") { w.stats.d++; w.streak = 0; d = rule.turned; }
+            else { w.stats.m++; w.streak++; d = rule.miss(w.streak); }
+            var ns = Math.max(0, Math.min(1, Math.round((w.score + d) * 100) / 100));
+            entry.delta = Math.round((ns - w.score) * 100) / 100; w.score = ns;
+          }
+        }
+      });
+      w.feed.unshift(entry);
+      if (e.f && e.f.out === "taken" && (done || p >= ans)) { busyUntil = Math.max(busyUntil, e.min + e.busy); lastJob = e.text; }
+      if (!done && e.f) {
+        var elapsed = Math.min(p / 0.75, 1) * wait;
+        var answered = e.f.answerSec != null && e.f.answerSec < wait && elapsed >= e.f.answerSec;
+        if (!answered && p < 0.75) { w.screen = "ping"; w.status = "Being pinged"; w.left = wait - elapsed; w.job = e.text; }
+        else if (e.f.out === "taken") { w.screen = "on"; w.job = e.text; }
+        else if (e.f.out === "turned") { w.screen = "res"; w.res = { big: "Passed.", p: "The callout moved on.", cls: "" }; }
+        else { w.screen = "res"; w.res = { big: "Time's up.", p: "The callout moved on.", cls: "m" }; }
+      }
+    });
+    if (w.screen === "idle" && sim < busyUntil) { w.screen = "on"; w.job = lastJob; }
+    if (w.screen === "idle" && busyUntil > 0 && sim >= busyUntil && sim < busyUntil + 55) w.screen = "win";
+    if (w.status === "Available" && sim < busyUntil) w.status = "On callout";
+    if (w.screen === "on") w.status = "On callout";
+    w.say = uu >= day.total - 0.05 ? day.end : say;
+    w.sim = sim;
+    return w;
+  }
+
+  function buildTimeline() {
+    var ticks = "", i;
+    for (i = 0; i <= 8; i++) ticks += '<span class="tick" style="left:' + (i / 8 * 100) + '%">' + hhmm(i * 60) + "</span>";
+    $("ticks").innerHTML = ticks;
+    var b = "", m = "";
+    day.events.forEach(function (e, idx) {
+      var cls = e.type === "ticket" ? "ticket" : !e.f ? "skipped" : e.f.out;
+      m += '<button type="button" class="mk ' + cls + '" style="left:' + (e.min / DAY * 100) + '%" data-i="' + idx + '" aria-label="Jump to ' + hhmm(e.min) + '"><span class="lb">' + hhmm(e.min) + "</span></button>";
+      if (e.busy) b += '<div class="busy" style="left:' + (e.min / DAY * 100) + "%;width:" + (e.busy / DAY * 100) + '%"></div>';
+    });
+    $("busyl").innerHTML = b; $("mks").innerHTML = m;
+  }
+
+  function paintDay() {
+    var w = dayWorld(u); render(w);
+    $("clock").textContent = hhmm(w.sim);
+    $("head").style.left = (w.sim / DAY * 100) + "%";
+    $("narr").textContent = w.say || "";
+    $("play").textContent = playing ? "Pause" : (u >= day.total ? "Done" : "Play");
+    $("play").disabled = u >= day.total && !playing;
+  }
+  function tick(ts) {
+    if (!playing) return;
+    if (last) u = Math.min(day.total, u + (ts - last) / 1000);
+    last = ts; paintDay();
+    if (u >= day.total) { playing = false; paintDay(); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function play() { if (u >= day.total) u = 0; playing = true; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); paintDay(); }
+  function pause() { playing = false; cancelAnimationFrame(raf); paintDay(); }
+
+  $("play").addEventListener("click", function () { playing ? pause() : play(); });
+  $("replay").addEventListener("click", function () { u = 0; play(); });
+  $("track").addEventListener("click", function (ev) {
+    var r = $("track").getBoundingClientRect(), m = Math.max(0, Math.min(DAY, (ev.clientX - r.left) / r.width * DAY));
+    var mk = ev.target.closest && ev.target.closest(".mk");
+    if (mk) m = day.events[+mk.getAttribute("data-i")].min - 4;
+    u = uFor(Math.max(0, m)); var was = playing; if (!was) paintDay(); else { last = 0; }
+  });
+
+  /* ---------- Page 3: the interactive product ---------- */
+  var live = null, simTimer = null, simIdx = 0, SPEED = 6;
+  var ORDER = [T.E, T.D, T.F, T.B, T.A, T.C];
+  function liveReset() {
+    clearInterval(simTimer); simIdx = 0;
+    live = blank(); live.score = 0.5; live.start = 0.5; live.streak = 0; live.clock = 9 * 60; live.active = false;
+    live.total = 90; liveBts(); render(live); $("send").disabled = false;
+  }
+  function liveBts() {}
+  function nextClock() { live.clock += 17; var h = Math.floor(live.clock / 60), m = live.clock % 60; return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }
+
+  function simulate() {
+    if (live.active) return;
+    var text = ORDER[simIdx++ % ORDER.length], entry = { time: nextClock(), text: text, chips: [] };
+    live.feed.unshift(entry);
+    if (live.off || live.status === "On callout") {
+      entry.chips.push({ who: "Cindermark", out: null }); render(live);
+      setTimeout(function () { entry.chips[0].out = "taken"; render(live); }, 1200);
+      return;
+    }
+    live.active = true; $("send").disabled = true;
+    live.stats.p++; entry.chips.push({ who: "Farlight", out: null }); entry.fi = 0;
+    live.status = "Being pinged"; live.screen = "ping"; live.job = text; live.total = 90; live.left = 90; live.t0 = Date.now();
+    render(live);
+    simTimer = setInterval(function () {
+      live.left = 90 - (Date.now() - live.t0) / 1000 * SPEED;
+      if (live.left <= 0) { liveFinish("missed"); return; }
+      render(live);
     }, 100);
   }
+  function liveFinish(kind) {
+    if (!live.active) return;
+    clearInterval(simTimer); live.active = false;
+    var entry = live.feed[0];
+    entry.chips[0].out = kind === "take" ? "taken" : kind === "pass" ? "turned" : "missed";
+    var before = live.score;
+    if (kind === "take") { live.score = Math.min(1, live.score + 0.08); live.streak = 0; live.stats.t++; live.status = "On callout"; live.screen = "on"; }
+    else if (kind === "pass") {
+      live.score = Math.max(0, live.score - 0.12); live.streak = 0; live.stats.d++; live.status = "Available";
+      live.screen = "res"; live.res = { big: "Passed.", p: "The callout moved on.", cls: "" };
+    } else {
+      live.streak++; live.stats.m++; live.status = "Available"; if (live.streak >= 3) live.score = Math.max(0, live.score - 0.06);
+      live.screen = "res"; live.res = { big: "Time's up.", p: "The callout moved on.", cls: "m" };
+    }
+    live.score = Math.round(live.score * 100) / 100;
+    entry.delta = Math.round((live.score - before) * 100) / 100;
+    if (kind !== "take") {
+      entry.chips.push({ who: "Cindermark", out: null });
+      setTimeout(function () { entry.chips[1].out = "taken"; render(live); }, 1200);
+      setTimeout(function () { if (live.screen === "res") { live.screen = "idle"; render(live); } }, 2200);
+    }
+    $("send").disabled = false; liveBts(); render(live);
+  }
+  $("send").addEventListener("click", function () { if (page === 3) simulate(); });
+  $("take").addEventListener("click", function () { if (page === 3) liveFinish("take"); });
+  $("pass").addEventListener("click", function () { if (page === 3) liveFinish("pass"); });
+  $("done").addEventListener("click", function () {
+    if (page !== 3 || live.screen !== "on") return;
+    live.status = live.off ? "Off duty" : "Available"; live.screen = "win"; $("done").disabled = true; render(live);
+    setTimeout(function () { if (live.screen === "win") { live.screen = "idle"; } $("done").disabled = false; render(live); }, 2600);
+  });
+  $("pill").addEventListener("click", function () {
+    if (page !== 3 || live.active || live.screen === "on") return;
+    live.off = !live.off; live.status = live.off ? "Off duty" : "Available"; render(live);
+  });
 
-  $("m-today").addEventListener("click", function () { mode = "today"; reset(); });
-  $("m-fixed").addEventListener("click", function () { mode = "fixed"; reset(); });
-  $("send").addEventListener("click", ping);
-  $("take").addEventListener("click", function () { finish("take"); });
-  $("pass").addEventListener("click", function () { finish("pass"); });
-  $("back").addEventListener("click", function () { show("sc-idle"); });
+  /* ---------- Ticket form (all pages) ---------- */
+  var opener = null;
+  function openForm() { opener = document.activeElement; $("scrim").hidden = false; $("det").focus(); }
+  function closeForm() { $("scrim").hidden = true; if (opener) opener.focus(); }
+  $("tkt").addEventListener("click", openForm);
+  $("cancel").addEventListener("click", closeForm);
+  $("scrim").addEventListener("keydown", function (e) { if (e.key === "Escape") closeForm(); });
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault(); closeForm(); $("form").reset();
+    var tm = page === 3 ? live.clock : null;
+    $("tnote").textContent = "Ticket submitted";
+    $("toast").hidden = false; setTimeout(function () { $("toast").hidden = true; }, 2200);
+    if (page === 3) live.tnote = "Ticket submitted";
+  });
 
-  reset();
+  /* ---------- Page switching ---------- */
+  function go(n) {
+    page = n; pause();
+    [1, 2, 3].forEach(function (i) { $("tab" + i).setAttribute("aria-selected", String(i === n)); });
+    $("note").innerHTML = NOTE[n];
+    var isDay = n !== 3;
+    $("tl").hidden = !isDay; $("sim").hidden = isDay; $("bts").hidden = isDay;
+    $("phone").classList.toggle("interactive", !isDay);
+    if (isDay) { day = DAYS[n]; buildTimeline(); u = 0; $("tnote").textContent = ""; play(); }
+    else { liveReset(); $("tnote").textContent = ""; $("toast").hidden = true; }
+  }
+  [1, 2, 3].forEach(function (i) { $("tab" + i).addEventListener("click", function () { go(i); }); });
+
+  go(1);
 })();
 </script>
 </body>
