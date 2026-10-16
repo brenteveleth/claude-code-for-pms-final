@@ -5,7 +5,7 @@ Status: proposal. Nothing is built. Engineering has not reviewed it. Helen to co
 
 ## The problem in one paragraph
 
-4.2 cut the ping wait from 90 to 60 seconds, so slow answers became "missed". The scoring code counts a miss as a decline (-0.12; a yes gives +0.08) and nothing brings a score back (the 2019 TODO). Low scores mean rarely asked, so a responder cannot earn points back. Four responders (Vesper, The Undertow, Meteor Mite, Farlight) missed 58.9% of pings after 4.2 (2.9% before). All four reached a score of 0 by 5 Sep, and their pings fell from about 7 a day (together) to about 2. Priya's "seasonal dip" does not fit: the drop starts on 12 Aug at 09:04.
+4.2 cut the ping wait from 90 to 60 seconds, so slow answers became "missed". The scoring code counts a miss as a decline (-0.12; a yes gives +0.08) and nothing brings a score back (the 2019 TODO). Low scores mean rarely asked, so a responder cannot earn points back. Four responders (Vesper, The Undertow, Meteor Mite, Farlight) missed 58.9% of pings after 4.2 (2.9% before). A replay of the scoring code on the real outcomes shows all four reached a score of 0 by 5 Sep (real scores were never observed). Their pings fell from about 7 a day (together) to about 2. Priya's "seasonal dip" does not fit: the drop starts on 12 Aug at 09:04.
 
 ## 1. Who the fix is for
 
@@ -46,10 +46,29 @@ Considered, not chosen: always asking a home-area hero first. It breaks the loop
 
 ## How we know it worked
 
+Measured over the 4 weeks after phase 1 ships (window proposed by the PM; Helen to confirm):
+
 - Each of the four is back to about 1.7 pings a day.
 - Their miss rate moves toward the others' (about 14% or less).
 - Callout tickets fall from 20 to 32 a week back to 5 to 8.
 - Acceptance rate is not the test. It recovered to 73% while tickets stayed high.
+
+## Definition of ready
+
+The brief is met when someone other than the author can check each line below.
+
+**Phase 1**
+- `OFFER_TIMEOUT_SECONDS` is 90 in `config.py`.
+- `SCORE_FLOOR` is 0.3 in `config.py`.
+- No other value in `config.py` changed: weights 0.60 / 0.25 / 0.15, credit +0.08, penalty -0.12.
+- Right after the reset, `history.recent_acceptance` returns 0.50 for Vesper, The Undertow, Meteor Mite and Farlight.
+- After the reset, no responder's score is below 0.30.
+
+**Phase 2**
+- A test shows the first 2 misses in a row change a score by 0, and the 3rd and later each cost 0.06.
+- A test shows a taken or turned-down answer resets the miss count to 0.
+- Every new ping row has an answer time (seconds from sent to answered). Rows for missed pings say so.
+- The one-time reset from phase 1 is not run again.
 
 ## 3. What the fix does not do
 
