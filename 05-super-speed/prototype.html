@@ -188,6 +188,29 @@
   @keyframes slam { 0% { transform: scale(3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   @keyframes fly { 0% { opacity: 1; transform: translate(0,0) scale(.4); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.3) rotate(240deg); } }
   @keyframes shake { 0%,100% { transform: translate(0); } 25% { transform: translate(-5px, 3px); } 75% { transform: translate(5px, -3px); } }
+  /* page 4 */
+  .p4 { max-width: 1320px; margin: 0 auto; padding: 18px 20px 48px; }
+  .seg { display: inline-flex; background: #10154a; border: 2px solid #262c66; border-radius: 14px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+  .seg button { min-height: 48px; padding: 8px 20px; border-radius: 10px; border: 0; background: transparent; color: var(--steel); font-weight: 700; }
+  .seg button[aria-pressed="true"] { background: var(--gold); color: var(--night); }
+  .method { margin: 12px 0 0; padding: 12px 16px; max-width: 980px; border: 1px dashed var(--steel); border-radius: 12px; color: var(--steel); font-size: 14px; }
+  .method b { color: var(--white); }
+  .console.wide { height: auto; margin-top: 18px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 720px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tiles .stat .g { font-size: 13px; color: var(--sub); font-weight: 600; }
+  .tbl { overflow-x: auto; border: 2px solid var(--night); border-radius: 14px; background: var(--white); }
+  table.roster { width: 100%; border-collapse: collapse; min-width: 640px; }
+  .roster th { text-align: left; font-size: 13px; color: var(--sub); padding: 10px 14px; border-bottom: 2px solid var(--night); background: var(--mist); }
+  .roster td { padding: 10px 14px; border-bottom: 1px solid #cdd3ee; vertical-align: top; }
+  .roster tr.grp td { background: var(--night); color: var(--white); font-weight: 700; padding: 8px 14px; }
+  .roster tr.hit td:first-child { box-shadow: inset 6px 0 0 var(--alarm); }
+  .roster .nm { font-weight: 700; }
+  .roster .ar { font-size: 13px; color: var(--sub); }
+  .roster .v { font-family: var(--display); font-size: 20px; }
+  .roster .d { display: block; font-size: 12px; font-weight: 700; color: var(--sub); }
+  .roster .d.up { color: var(--okdeep); } .roster .d.down { color: #c4162b; }
+  .roster .gauge { width: 90px; margin: 4px 0 0; height: 10px; }
   @media (prefers-reduced-motion: reduce) { .alert, .win, .rays, .badge, .slam, .star, .flashw { animation: none; } .star { display: none; } .badge, .slam { opacity: 1; } }
 </style>
 </head>
@@ -199,6 +222,7 @@
     <button role="tab" id="tab1" aria-selected="true" data-page="1">1 · 4.2 today</button>
     <button role="tab" id="tab2" aria-selected="false" data-page="2">2 · After the fix</button>
     <button role="tab" id="tab3" aria-selected="false" data-page="3">3 · Try it</button>
+    <button role="tab" id="tab4" aria-selected="false" data-page="4">4 · Over time</button>
   </div>
 </nav>
 <p class="note" id="note"></p>
@@ -327,6 +351,24 @@
   </div>
 </section>
 
+<section class="p4" id="p4" aria-label="Projection over time" hidden>
+  <div class="seg" role="group" aria-label="Point in time">
+    <button type="button" data-t="now" aria-pressed="true">Now (4.2, observed)</button>
+    <button type="button" data-t="w1" aria-pressed="false">After 1 week</button>
+    <button type="button" data-t="m1" aria-pressed="false">After 1 month</button>
+  </div>
+  <p class="method"><b>How this is projected.</b> Everyone's mix of taken, turned-down and missed pings goes back to what it was before 4.2, when the wait was 90 seconds. Scores follow the real rules (+0.08 taken, -0.12 otherwise, floor 0.30), with the four reset to 0.50, and each score stops climbing at that hero's own level from before 4.2. The four's pings climb with their score: about 20% of their old volume at a score of 0 (seen after 4.2) up to 100% at 0.9 or more (seen before 4.2). The line between is my assumption. The other 12 give back the overflow they picked up as the four return. "Now" is the average from 12 Aug to 6 Sep. One month is 4 weeks. The 4.2 proximity weight stays, so the four may not get all of their old volume back.</p>
+  <div class="console wide">
+    <header><strong>Rook Dispatch</strong><span class="who">All responders</span></header>
+    <div class="cbody">
+      <div class="tiles" id="tiles"></div>
+      <div class="tbl"><table class="roster"><caption class="sr" style="position:absolute;left:-9999px">Responder stats</caption>
+        <thead><tr><th>Responder</th><th>Pings a week</th><th>Taken</th><th>Missed</th><th>Routing score</th></tr></thead>
+        <tbody id="rows"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
 <div class="scrim" id="scrim" hidden>
   <form class="dlg" id="form" role="dialog" aria-modal="true" aria-labelledby="dt">
     <h2 id="dt">Submit a ticket</h2>
@@ -361,6 +403,7 @@
   var NOTE = {
     1: "<b>Page 1 · 4.2 today.</b> One working day for Farlight and Linda, fast-forwarded to about 20 seconds. Built from Farlight's real pattern since 12 Aug (asked on about 1 in 5 Uptown callouts). Answer times are assumed: we have no response-time data.",
     2: "<b>Page 2 · After the fix (phase 1, ships now).</b> The same three callouts: the wait is back to 90 seconds, Farlight's score is reset to 0.50 and cannot fall below 0.30, so Farlight is asked first again. Projected from replays, not live data.",
+    4: "<b>Page 4 · Over time.</b> All 16 responders: the four hit by 4.2 and the other 12. Switch between now, after 1 week and after 1 month of phase 1. These are projections, built from real ping history and the real scoring rules.",
     3: "<b>Page 3 · Try it.</b> The product after phase 1. Simulate a callout, then take it, pass, or let it run out. Tick the box under the phone to preview phase 2, where the first 2 misses in a row are free. Click the ticket button or Farlight's status on the phone."
   };
 
@@ -636,18 +679,67 @@
     if (page === 3) live.tnote = "Ticket submitted";
   });
 
+  /* ---------- Page 4: the roster over time ---------- */
+  var ROSTER = [{"name":"Farlight","area":"Uptown","handler":"Linda Pruitt","four":true,"now":[3.0,18,64,0],"w1":[7.7,73,4,0.71],"m1":[11.3,73,4,0.84]},{"name":"Meteor Mite","area":"Eastgate","handler":"Kip","four":true,"now":[3.8,21,57,0],"w1":[7.2,69,3,0.62],"m1":[11.1,69,3,1.0]},{"name":"The Undertow","area":"Harborside","handler":"Desmond Okafor","four":true,"now":[3.8,21,64,0],"w1":[7.7,77,1,0.77],"m1":[11.7,77,1,0.88]},{"name":"Vesper","area":"Old Town","handler":"Aunt Dot","four":true,"now":[4.6,29,53,0],"w1":[8.8,81,3,0.88],"m1":[13.7,81,3,0.96]},{"name":"Captain Vantage","area":"Hillcrest","handler":"Mr. Ambrose","four":false,"now":[15.9,71,10,0.92],"w1":[13.8,74,3,0.96],"m1":[12.2,74,3,0.96]},{"name":"Cindermark","area":"Mill District","handler":"Farid Haddad","four":false,"now":[11.3,69,12,0.96],"w1":[10.1,79,2,0.96],"m1":[9.1,79,2,0.96]},{"name":"Corporal Ashgrove","area":"Northfield","handler":"Yusuf Demir","four":false,"now":[7.8,66,14,1],"w1":[9.0,78,2,1.0],"m1":[10.0,78,2,1.0]},{"name":"Halfmoon","area":"Westbury","handler":"Simone Fischer","four":false,"now":[8.9,64,15,1],"w1":[10.0,72,0,1.0],"m1":[10.9,72,0,1.0]},{"name":"Ironvale","area":"Riverside","handler":"Teresa Alvarez","four":false,"now":[10.5,67,18,0.72],"w1":[9.2,76,2,1.0],"m1":[8.2,76,2,1.0]},{"name":"Nightwell","area":"Midtown","handler":"Marjorie Sung","four":false,"now":[18.8,67,11,0.88],"w1":[16.8,76,3,0.96],"m1":[15.2,76,3,0.96]},{"name":"Sgt. Bulwark","area":"Foundry Row","handler":"Halloran","four":false,"now":[10.5,67,18,1],"w1":[9.7,75,0,1.0],"m1":[9.1,75,0,1.0]},{"name":"Sgt. Falkirk","area":"Kingsbridge","handler":"Owen Bramwell","four":false,"now":[14.0,69,15,0.76],"w1":[11.8,79,3,1.0],"m1":[10.1,79,3,1.0]},{"name":"Stormwrack","area":"Southport","handler":"Renata Kovač","four":false,"now":[17.0,71,14,0.76],"w1":[14.8,79,0,0.88],"m1":[13.1,79,0,0.88]},{"name":"The Drift","area":"Greenway","handler":"Beatrice Calloway","four":false,"now":[7.5,64,18,0.84],"w1":[6.8,85,3,1.0],"m1":[6.2,85,3,1.0]},{"name":"The Gale","area":"Eastgate","handler":"Kip","four":false,"now":[18.6,70,12,0.96],"w1":[15.5,78,5,0.96],"m1":[13.2,78,5,0.96]},{"name":"The Longcast","area":"Lakeshore","handler":"Graham Petrov","four":false,"now":[8.6,66,16,0.96],"w1":[7.8,76,2,1.0],"m1":[7.2,76,2,1.0]}];
+  var when = "now";
+  function sgn(v, dp, unit) { var r = Math.round(v * Math.pow(10, dp)) / Math.pow(10, dp); return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(dp) + (unit || ""); }
+  function dcell(cur, base, dp, unit, goodUp) {
+    if (when === "now") return "";
+    var d = cur - base, r = Math.round(d * Math.pow(10, dp)) / Math.pow(10, dp);
+    if (r === 0) return '<span class="d">no change</span>';
+    var good = goodUp ? r > 0 : r < 0;
+    return '<span class="d ' + (good ? "up" : "down") + '">' + sgn(d, dp, unit) + " vs now</span>";
+  }
+  function group(four) {
+    var rs = ROSTER.filter(function (r) { return r.four === four; }), n = 0, tp = 0, tm = 0, sc = 0;
+    rs.forEach(function (r) { var v = r[when]; tp += v[0]; tm += v[0] * v[2]; sc += v[3]; });
+    var base = 0, bm = 0; rs.forEach(function (r) { base += r.now[0]; bm += r.now[0] * r.now[2]; });
+    return { pings: tp, miss: tp ? tm / tp : 0, score: sc / rs.length, bpings: base };
+  }
+  function renderRoster() {
+    var h = "", t = "";
+    [true, false].forEach(function (four) {
+      var g = group(four), label = four ? "The four hit by 4.2" : "The other 12";
+      t += '<div class="stat"><div class="g">' + label + '</div><div class="k">Pings a week (total)</div><div class="v">' + Math.round(g.pings) + "</div></div>" +
+           '<div class="stat"><div class="g">' + label + '</div><div class="k">Missed</div><div class="v">' + Math.round(g.miss) + "%</div></div>" +
+           '<div class="stat"><div class="g">' + label + '</div><div class="k">Average routing score</div><div class="v">' + g.score.toFixed(2) + "</div></div>";
+    });
+    $("tiles").innerHTML = t;
+    [true, false].forEach(function (four) {
+      h += '<tr class="grp"><td colspan="5">' + (four ? "The four hit by 4.2" : "The other 12") + "</td></tr>";
+      ROSTER.filter(function (r) { return r.four === four; }).forEach(function (r) {
+        var c = r[when], b = r.now;
+        h += '<tr class="' + (four ? "hit" : "") + '"><td><div class="nm">' + r.name + '</div><div class="ar">' + r.area + " · " + r.handler + "</div></td>" +
+          '<td><span class="v">' + c[0].toFixed(1) + "</span>" + dcell(c[0], b[0], 1, "", true) + "</td>" +
+          '<td><span class="v">' + c[1] + "%</span>" + dcell(c[1], b[1], 0, " pts", true) + "</td>" +
+          '<td><span class="v">' + c[2] + "%</span>" + dcell(c[2], b[2], 0, " pts", false) + "</td>" +
+          '<td><span class="v">' + c[3].toFixed(2) + '</span><div class="gauge"><i style="width:' + Math.round(c[3] * 100) + '%"></i></div>' + dcell(c[3], b[3], 2, "", true) + "</td></tr>";
+      });
+    });
+    $("rows").innerHTML = h;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll ? document.querySelectorAll(".seg button") : [], function (b) {
+    b.addEventListener("click", function () {
+      when = b.getAttribute("data-t");
+      Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      renderRoster();
+    });
+  });
+
   /* ---------- Page switching ---------- */
   function go(n) {
     page = n; pause();
-    [1, 2, 3].forEach(function (i) { $("tab" + i).setAttribute("aria-selected", String(i === n)); });
+    [1, 2, 3, 4].forEach(function (i) { $("tab" + i).setAttribute("aria-selected", String(i === n)); });
     $("note").innerHTML = NOTE[n];
+    $("p4").hidden = n !== 4; $("stage").hidden = n === 4;
+    if (n === 4) { $("tl").hidden = true; renderRoster(); return; }
     var isDay = n !== 3;
     $("tl").hidden = !isDay; $("sim").hidden = isDay; $("bts").hidden = isDay;
     $("phone").classList.toggle("interactive", !isDay);
     if (isDay) { day = DAYS[n]; buildTimeline(); u = 0; $("tnote").textContent = ""; play(); }
     else { liveReset(); $("tnote").textContent = ""; $("toast").hidden = true; }
   }
-  [1, 2, 3].forEach(function (i) { $("tab" + i).addEventListener("click", function () { go(i); }); });
+  [1, 2, 3, 4].forEach(function (i) { $("tab" + i).addEventListener("click", function () { go(i); }); });
 
   go(1);
 })();
